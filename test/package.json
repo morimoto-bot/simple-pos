@@ -1,0 +1,7 @@
+{
+  "name": "simple-pos-tests",
+  "private": true,
+  "description": "Nodeの組み込みテストランナーで動かす。ZXingは ZXING_UMD で場所を指定するか、npm i @zxing/library@0.23.0 で test/node_modules に入れる",
+  "scripts": { "test": "node --test" },
+  "devDependencies": { "@zxing/library": "0.23.0" }
+}

@@ -1,0 +1,1475 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="簡易POS">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB1klEQVR42u3dMQ6CMBSA4dfGXU+qm57B0Zt6BDeXkgZiYvvg+1ZjwPpbAhFazvdrwJJqCBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiYE6ngdt+P1++gDUuj9uQ7ZYhj5qURYpEqjKy+P+4VWXoY4o4lJFrDKsy9OFUllnjMG1kHE8zB+JAHIgDcSAOxIE4EAfi4LiKdWUxcyAOxIE4EAfiQByIg3A7ZPgPaRzzBjgzB+JAHIgDcSAOxIE4EAfiQBwgDsSBOBAH4kAciANxIA7EAeJAHIgDcSAOxIE4EAfiQBwgDobHMWo19vDkFjMHueMweaQbybrLT6WMlIcVfSQavbr7T6iMyLjeiudPTv5zshgPTmURB+JAHIgDcRCW1IiVlze+p+/tBY/2pfZcv3OZpPP2zrY27eGPu7ppDw90hRSHFcSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgYxNMEMXMgDsSBOBAH4kAciANxIA4QB+JAHIgDcSAOxIE4EAfiAHEgDsSBOBAH4kAciANxIA4QB+JAHIgDcSAOJvUBkxtVG5uh7zoAAAAASUVORK5CYII=">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAB1klEQVR42u3dMQ6CMBSA4dfGXU+qm57B0Zt6BDeXkgZiYvvg+1ZjwPpbAhFazvdrwJJqCBAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIA3EgDhAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiYE6ngdt+P1++gDUuj9uQ7ZYhj5qURYpEqjKy+P+4VWXoY4o4lJFrDKsy9OFUllnjMG1kHE8zB+JAHIgDcSAOxIE4EAfi4LiKdWUxcyAOxIE4EAfiQByIg3A7ZPgPaRzzBjgzB+JAHIgDcSAOxIE4EAfiQBwgDsSBOBAH4kAciANxIA7EAeJAHIgDcSAOxIE4EAfiQBwgDobHMWo19vDkFjMHueMweaQbybrLT6WMlIcVfSQavbr7T6iMyLjeiudPTv5zshgPTmURB+JAHIgDcRCW1IiVlze+p+/tBY/2pfZcv3OZpPP2zrY27eGPu7ppDw90hRSHFcSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgYxNMEMXMgDsSBOBAH4kAciANxIA4QB+JAHIgDcSAOxIE4EAfiAHEgDsSBOBAH4kAciANxIA4QB+JAHIgDcSAOJvUBkxtVG5uh7zoAAAAASUVORK5CYII=">
+<title>簡易POS</title>
+<style>
+:root{
+  --bg:#f4f6f7; --card:#fff; --text:#16202a; --sub:#5b6773; --line:#d9dee3;
+  --pri:#0f766e; --pri-d:#0b5a54; --pri-t:#fff;
+  --ok:#15803d; --ok-bg:#dcfce7; --warn:#c2410c; --warn-bg:#ffedd5; --bad:#b91c1c; --bad-bg:#fee2e2; --mute-bg:#eef1f3;
+  --shadow:0 1px 3px rgba(0,0,0,.12);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#10161b; --card:#1a232b; --text:#e8edf1; --sub:#9aa7b3; --line:#2c3844;
+    --pri:#2dd4bf; --pri-d:#14b8a6; --pri-t:#05211e;
+    --ok:#4ade80; --ok-bg:#12351f; --warn:#fb923c; --warn-bg:#3b2410; --bad:#f87171; --bad-bg:#3d1717; --mute-bg:#232e38;
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
+body{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;background:var(--pri);color:var(--pri-t)}
+header h1{font-size:17px;margin:0;flex:1;font-weight:700}
+.chip{font-size:12px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.22);border:0;color:inherit;max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.iconbtn{border:0;background:rgba(255,255,255,.22);color:inherit;width:38px;height:38px;border-radius:10px;font-size:20px}
+@media (prefers-color-scheme:dark){ header{background:#0f2f2c;color:#d7fffa} }
+nav#tabs{position:sticky;top:calc(54px + env(safe-area-inset-top));z-index:19;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--card);border-bottom:1px solid var(--line)}
+nav#tabs::-webkit-scrollbar{display:none}
+nav#tabs button{flex:1 0 auto;border:0;background:none;padding:11px 14px 9px;font-weight:700;color:var(--sub);border-bottom:3px solid transparent;white-space:nowrap}
+nav#tabs button[aria-selected=true]{color:var(--pri);border-bottom-color:var(--pri)}
+main{max-width:720px;margin:0 auto;padding:10px 12px}
+.chk{width:22px;height:22px;flex:none;margin-right:4px}
+#manualJan.kbdon{border-color:var(--pri,#0a84ff);box-shadow:0 0 0 2px rgba(10,132,255,.25)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;box-shadow:var(--shadow)}
+.row{display:flex;gap:8px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.sub{color:var(--sub);font-size:13px}
+.name{font-size:19px;font-weight:700;line-height:1.3;word-break:break-word}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--mute-bg);color:var(--sub)}
+.tag.loc{background:#e0f2fe;color:#075985}
+@media (prefers-color-scheme:dark){.tag.loc{background:#0c2c3f;color:#7dd3fc}}
+.tag.ok{background:var(--ok-bg);color:var(--ok)} .tag.warn{background:var(--warn-bg);color:var(--warn)} .tag.bad{background:var(--bad-bg);color:var(--bad)}
+.btn{border:1px solid var(--line);background:var(--card);padding:11px 14px;border-radius:12px;font-weight:700;min-height:44px}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:var(--pri-t)}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.sm{padding:6px 10px;min-height:34px;font-size:14px}
+.btn.block{display:block;width:100%}
+.btn:disabled{opacity:.45}
+.btn{white-space:nowrap}
+input[type=text],input[type=number],input[type=search],input[type=tel],input[type=password],input[type=url],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);min-height:44px}
+textarea{min-height:110px;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+.card a,.hint a{color:var(--pri);text-decoration:underline}
+label.f{display:block;margin:8px 0 4px;font-size:13px;font-weight:700;color:var(--sub)}
+#camBox{position:relative;background:#000;border-radius:14px;overflow:hidden;height:clamp(160px,27vh,300px);margin-top:4px}
+#camBox video{width:100%;height:100%;object-fit:cover;display:block}
+#camBox .frame{position:absolute;left:4%;right:4%;top:22%;bottom:22%;border:2px solid rgba(255,255,255,.85);border-radius:10px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.28)}
+#camBox.flash .frame{border-color:#4ade80;box-shadow:0 0 0 9999px rgba(74,222,128,.28)}
+#camBox .msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;padding:16px;font-size:14px;background:rgba(0,0,0,.55)}
+#camBox .msg.hide{display:none}
+#camBox .codebar{position:absolute;left:0;right:0;bottom:0;display:none;align-items:center;gap:8px;padding:8px 10px;background:rgba(15,118,110,.92);color:#fff;font-size:14px;font-weight:700}
+#camBox .codebar.on{display:flex}
+#camBox .codebar span{flex:1}
+#camBox .codebar button{border:0;border-radius:8px;padding:6px 12px;font-weight:700;background:#fff;color:#0b5a54}
+.seg{display:flex;gap:0;margin:4px 0 8px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.seg button{flex:1;border:0;background:none;padding:10px 6px;font-weight:700;color:var(--sub)}
+.seg button.on{background:var(--pri);color:var(--pri-t)}
+.steps{display:flex;gap:6px;margin:6px 0}
+.steps span{flex:1;text-align:center;padding:7px 4px;border-radius:10px;background:var(--mute-bg);color:var(--sub);font-weight:700;font-size:13px}
+.steps span.cur{background:var(--pri);color:var(--pri-t)}
+.steps span.done{background:var(--ok-bg);color:var(--ok)}
+.stepper{display:flex;gap:8px;align-items:center}
+.stepper button{width:54px;height:54px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:26px;font-weight:700}
+.stepper input{width:96px;text-align:center;font-size:24px;font-weight:700;min-height:54px}
+.kv{display:flex;gap:10px;margin:8px 0}
+.kv>div{flex:1;background:var(--mute-bg);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--sub)}
+.kv b{display:block;font-size:22px;color:var(--text)}
+.item{border-left:6px solid var(--line);padding:10px 10px 10px 12px;margin:8px 0;background:var(--card);border-radius:10px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.item.match{border-left-color:var(--ok);background:linear-gradient(0deg,var(--ok-bg),var(--ok-bg))}
+.item.short{border-left-color:var(--warn);background:linear-gradient(0deg,var(--warn-bg),var(--warn-bg))}
+.item.over,.item.extra{border-left-color:var(--bad);background:linear-gradient(0deg,var(--bad-bg),var(--bad-bg))}
+.item.hot{outline:3px solid var(--pri)}
+.item .nums{font-size:15px}
+.item .nums b{font-size:20px}
+.mini{display:flex;gap:6px;align-items:center}
+.mini button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:20px;font-weight:700}
+.banner{border-radius:14px;padding:14px;text-align:center;font-size:26px;font-weight:800;margin:10px 0}
+.banner.ok{background:var(--ok-bg);color:var(--ok)} .banner.warn{background:var(--warn-bg);color:var(--warn)}
+.banner small{display:block;font-size:13px;font-weight:600;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:7px 12px;background:var(--card);font-weight:600}
+.chips input{width:18px;height:18px}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:60;pointer-events:none;display:flex;flex-direction:column;gap:6px;align-items:center}
+#toast div{background:#1f2933;color:#fff;border-radius:12px;padding:10px 14px;max-width:560px;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#toast div.warn{background:#9a3412} #toast div.bad{background:#991b1b} #toast div.ok{background:#166534}
+#modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center}
+#modal.on{display:flex}
+#modal .sheet{background:var(--card);width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom))}
+#modal h2{margin:0 0 6px;font-size:18px}
+.hint{background:var(--mute-bg);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--sub)}
+.err{color:var(--bad);font-size:14px}
+.pre{white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--mute-bg);border-radius:10px;padding:8px 10px;word-break:break-all}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t td,table.t th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.t td.n,table.t th.n{text-align:right;white-space:nowrap}
+.sw{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.sw input{width:22px;height:22px}
+.diff-pos{color:var(--bad);font-weight:700}.diff-neg{color:var(--warn);font-weight:700}.diff-zero{color:var(--ok);font-weight:700}
+body.noscan #camBox,body.noscan #camBtn,body.noscan [data-act=photo],body.noscan #manualJan,body.noscan #manualJan+button,body.noscan #scanRow,body.noscan #scanRow2{display:none}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-top:8px}
+.pbtn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 8px 7px;text-align:left;min-height:64px;display:flex;flex-direction:column;justify-content:space-between;gap:2px}
+.pbtn b{font-size:14px;line-height:1.25;word-break:break-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pbtn span{font-size:13px;color:var(--sub)}
+.pbtn:active{background:var(--mute-bg)}
+.line{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.line .nm{flex:1;min-width:0}
+.line .nm b{font-size:15px;word-break:break-all}
+.line .amt{font-weight:800;font-size:17px;text-align:right;min-width:78px}
+.big{font-size:34px;font-weight:800;letter-spacing:.5px}
+.bigrow{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0}
+.tg{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--warn-bg);color:var(--warn);margin-left:4px}
+.tg.off{background:var(--mute-bg);color:var(--sub)}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.quick .btn{min-height:40px;padding:6px 12px}
+.numin{font-size:26px;font-weight:800;text-align:right}
+.rc{font-family:ui-monospace,Menlo,"Hiragino Sans",monospace;font-size:13px;line-height:1.5;background:#fff;color:#111;border:1px dashed #999;border-radius:6px;padding:12px;max-width:340px;margin:0 auto}
+.rc h3{margin:0 0 2px;font-size:15px;text-align:center}
+.rc .c{text-align:center}.rc .r{display:flex;justify-content:space-between;gap:8px}
+.rc hr{border:0;border-top:1px dashed #999;margin:6px 0}
+.rc .sm{font-size:11px;color:#444}
+.rc .ln{margin:2px 0}
+#printArea{display:none}
+@media print{
+  html,body{background:#fff!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important}
+  .rc{border:0;max-width:80mm;margin:0;padding:0;font-size:12px}
+}
+
+.cl{flex-wrap:wrap}.cl .nm{flex:1 1 100%}
+.cl .ctl{display:flex;gap:8px;align-items:center;width:100%;justify-content:space-between}
+body:not(.camon) #camBox{display:none}
+#camBox{height:clamp(120px,22vh,220px)}
+</style>
+</head>
+<body>
+<header>
+  <h1>簡易POS</h1>
+  <button class="chip" id="status" data-act="settings" title="接続状態">未設定</button>
+  <button class="iconbtn" data-act="settings" aria-label="設定">⚙</button>
+</header>
+<nav id="tabs" role="tablist">
+  <button role="tab" data-act="tab" data-mode="sale">レジ</button>
+  <button role="tab" data-act="tab" data-mode="tx">取引</button>
+  <button role="tab" data-act="tab" data-mode="settle">精算</button>
+  <button role="tab" data-act="tab" data-mode="item">商品</button>
+  <button role="tab" data-act="tab" data-mode="recv">入荷</button>
+  <button role="tab" data-act="tab" data-mode="stk">棚卸</button>
+  <button role="tab" data-act="tab" data-mode="arc">アーカイブ</button>
+</nav>
+<main>
+  <div id="camBox">
+    <video id="video" playsinline webkit-playsinline muted autoplay></video>
+    <div class="frame"></div>
+    <div class="msg" id="camMsg">「カメラ開始」を押してください</div>
+  </div>
+  <div class="row wrap" style="margin-top:8px" id="scanRow">
+    <button class="btn pri grow" id="camBtn" data-act="camToggle">カメラ開始</button>
+    <button class="btn" data-act="photo">写真から読む</button>
+    <input type="file" id="photoIn" accept="image/*" hidden>
+  </div>
+  <div class="row" style="margin-top:8px" id="scanRow2">
+    <input type="text" id="manualJan" inputmode="numeric" pattern="[0-9]*" placeholder="JANを手入力（読めない時）" autocomplete="off">
+    <button class="btn" data-act="manualJan">読込</button>
+  </div>
+  <div id="panel"></div>
+  <input type="file" id="impFile" accept=".csv,.tsv,.txt,text/*" hidden>
+</main>
+<div id="toast"></div>
+<div id="modal"><div class="sheet" id="sheet"></div></div>
+<div id="printArea"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.23.0/umd/index.min.js" integrity="sha384-0ASr5PEWAMtTnWsn0PzKmioHVDA4+QqFiJr94io/0DCrGP6E1gRAmbO6O8y5WZW9" crossorigin="anonymous" defer></script>
+<script>
+'use strict';
+/* =====================================================================
+ * 画面ロジック（純粋な関数。テストで取り出して検証する）
+ * ===================================================================== */
+/* <logic> */
+const Logic = (function () {
+  function nfkc(s) { s = String(s == null ? '' : s); return s.normalize ? s.normalize('NFKC') : s; }
+  function janDigits(v) { return nfkc(v).replace(/\D/g, ''); }
+  function janKey(d) { const k = String(d).replace(/^0+/, ''); return k === '' ? '0' : k; }
+  function checkDigitOk(d) {
+    let sum = 0;
+    for (let i = d.length - 2, w = 3; i >= 0; i--, w = (w === 3 ? 1 : 3)) sum += Number(d.charAt(i)) * w;
+    return ((10 - (sum % 10)) % 10) === Number(d.charAt(d.length - 1));
+  }
+
+  function janDigits(v) { return nfkc(v).replace(/\D/g, ''); }
+  function janKey(d) { const k = String(d).replace(/^0+/, ''); return k === '' ? '0' : k; }
+  function checkDigitOk(d) {
+    let sum = 0;
+    for (let i = d.length - 2, w = 3; i >= 0; i--, w = (w === 3 ? 1 : 3)) sum += Number(d.charAt(i)) * w;
+    return ((10 - (sum % 10)) % 10) === Number(d.charAt(d.length - 1));
+  }
+
+  function janKey(d) { const k = String(d).replace(/^0+/, ''); return k === '' ? '0' : k; }
+  function checkDigitOk(d) {
+    let sum = 0;
+    for (let i = d.length - 2, w = 3; i >= 0; i--, w = (w === 3 ? 1 : 3)) sum += Number(d.charAt(i)) * w;
+    return ((10 - (sum % 10)) % 10) === Number(d.charAt(d.length - 1));
+  }
+
+  function checkDigitOk(d) {
+    let sum = 0;
+    for (let i = d.length - 2, w = 3; i >= 0; i--, w = (w === 3 ? 1 : 3)) sum += Number(d.charAt(i)) * w;
+    return ((10 - (sum % 10)) % 10) === Number(d.charAt(d.length - 1));
+  }
+
+  function validateJan(raw) {
+    const d = janDigits(raw);
+    if (!d) return { ok: false, reason: 'JANが空です' };
+    if (d.length !== 8 && d.length !== 12 && d.length !== 13) return { ok: false, reason: 'JANは8・12・13桁です（' + d.length + '桁）' };
+    if (!checkDigitOk(d)) return { ok: false, reason: 'チェックデジットが合いません' };
+    return { ok: true, jan: d, key: janKey(d) };
+  }
+
+  function yen(n) { return (n === null || n === undefined || n === '') ? '' : '¥' + Number(n).toLocaleString('ja-JP'); }
+
+  function speechText(item) {
+    let name = String(item.name || '').replace(/[【】\[\]（）()「」『』]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (name.length > 40) name = name.slice(0, 40);
+    const p = (item.price === null || item.price === undefined || item.price === '') ? '' : '、' + Number(item.price) + '円';
+    return name + p;
+  }
+
+  function splitCells(line) {
+    const delim = line.indexOf('\t') >= 0 ? '\t' : (line.indexOf(',') >= 0 ? ',' : null);
+    if (delim === null) return nfkc(line).trim().split(/\s+/);
+    const cells = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (inQ) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
+      else if (c === '"') inQ = true;
+      else if (c === delim) { cells.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cells.push(cur.trim());
+    return cells;
+  }
+
+  function decodeBytes(buf) {
+    const u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+    let s;
+    try { s = new TextDecoder('utf-8', { fatal: true }).decode(u8); }
+    catch (e) { s = new TextDecoder('shift_jis').decode(u8); }
+    return s.replace(/^﻿/, '');
+  }
+
+  function parseFragment(hash) {
+    const h = String(hash || '').replace(/^#/, '');
+    if (!h) return null;
+    const p = new URLSearchParams(h);
+    const gas = p.get('gas'), token = p.get('token');
+    if (!gas && !token) return null;
+    return { gas: gas || undefined, token: token || undefined };
+  }
+
+  function gasUrlProblem(u) {
+    u = String(u || '').trim();
+    if (!u) return '未入力です';
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(u)) {
+      if (/\/dev$/.test(u)) return '末尾が /dev です。デプロイ後の /exec のURLを入れてください';
+      return 'https://script.google.com/macros/s/…/exec の形式ではありません';
+    }
+    return '';
+  }
+
+  function rgbaToGray(data, w, h) {
+    const g = new Uint8ClampedArray(w * h);
+    for (let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = (data[j] * 299 + data[j + 1] * 587 + data[j + 2] * 114) / 1000;
+    return g;
+  }
+
+  function rotate90Gray(g, w, h) {
+    const out = new Uint8ClampedArray(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) out[x * h + (h - 1 - y)] = g[y * w + x];
+    return out;
+  }
+
+  function cropRegion(vw, vh, bw, bh) {
+    const boxAr = bw / bh, vidAr = vw / vh;
+    let visW, visH, visX, visY;
+    if (vidAr > boxAr) { visH = vh; visW = vh * boxAr; visX = (vw - visW) / 2; visY = 0; }
+    else { visW = vw; visH = vw / boxAr; visX = 0; visY = (vh - visH) / 2; }
+    return { x: Math.round(visX + visW * 0.04), y: Math.round(visY + visH * 0.22), w: Math.round(visW * 0.92), h: Math.round(visH * 0.56) };
+  }
+
+  function createDecoder(ZX, kind) {
+    const hints = new Map();
+    const BF = ZX.BarcodeFormat;
+    hints.set(ZX.DecodeHintType.POSSIBLE_FORMATS, kind === 'code'
+      ? [BF.EAN_13, BF.EAN_8, BF.UPC_A, BF.CODE_128, BF.CODE_39, BF.QR_CODE, BF.ITF, BF.CODABAR]
+      : [BF.EAN_13, BF.EAN_8, BF.UPC_A]);
+    hints.set(ZX.DecodeHintType.TRY_HARDER, true);
+    const reader = new ZX.MultiFormatReader();
+    reader.setHints(hints);
+    // ZXingは「バーコードなし」のたびに警告をconsoleへ出す（毎フレーム出て邪魔になる）ので、その警告だけ捨てる
+    const quiet = function (fn) {
+      if (typeof console === 'undefined') return fn();
+      const w = console.warn, l = console.log;
+      const filt = function (orig) { return function () { if (typeof arguments[0] === 'string' && arguments[0].indexOf('MultiFormatReader') === 0) return; return orig.apply(console, arguments); }; };
+      console.warn = filt(w); console.log = filt(l);
+      try { return fn(); } finally { console.warn = w; console.log = l; }
+    };
+    return function decode(gray, w, h) {
+      try {
+        const src = new ZX.RGBLuminanceSource(gray, w, h);
+        const bmp = new ZX.BinaryBitmap(new ZX.HybridBinarizer(src));
+        const res = quiet(function () { return reader.decodeWithState(bmp); });
+        return res ? res.getText() : null;
+      } catch (e) { return null; }
+    };
+  }
+
+  function toCsv(header, rows) {
+    const cell = function (v) {
+      let t = v === null || v === undefined ? '' : String(v);
+      if (/^[=+@\t\r]/.test(t)) t = "'" + t;
+      return /[",\r\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+    };
+    return [header].concat(rows).map(function (r) { return r.map(cell).join(','); }).join('\r\n') + '\r\n';
+  }
+
+  /* ---------- お金の計算（GASの calcCart_ と同じ式。テストで一致を確かめる） ---------- */
+  var RATE_LABEL = { 8: '8%', 10: '10%' };
+  var PAY_METHODS = ['現金', 'カード', 'その他'];
+  var ROUND_MODES = ['切り捨て', '切り上げ', '四捨五入'];
+
+  /** 整数の割り算の端数処理（num≧0, den>0）。0.5は切り上げ */
+  function roundDiv(num, den, mode) {
+    if (mode === '切り上げ') return Math.floor((num + den - 1) / den);
+    if (mode === '四捨五入') return Math.floor((2 * num + den) / (2 * den));
+    return Math.floor(num / den);
+  }
+  /** 値引・割引の額（0〜基準額）。disc: {type:'yen'|'pct', value}。％は切り捨て */
+  function discountAmount(base, disc) {
+    if (!disc || !disc.value) return 0;
+    const v = Number(disc.value);
+    if (disc.type === 'pct') return Math.min(base, Math.floor(base * v / 100));
+    return Math.min(base, v);
+  }
+  /** 税込の対価（税率別の合計）から内税額を出す。符号つき。1書類につき税率ごとに1回だけ端数処理 */
+  function taxInner(amount, rate, mode) {
+    const sign = amount < 0 ? -1 : 1;
+    return sign * roundDiv(Math.abs(amount) * rate, 100 + rate, mode);
+  }
+  /** カートの計算。lines: [{price(税込), qty, rate, disc}]、subDisc: 小計の値引・割引 */
+  function calcCart(lines, subDisc, mode) {
+    const out = []; let subtotal = 0;
+    lines.forEach(function (l) {
+      const gross = l.price * l.qty;
+      const d = discountAmount(gross, l.disc);
+      const net = gross - d;
+      out.push({ gross: gross, lineDisc: d, net: net, alloc: 0, amount: net, rate: l.rate });
+      subtotal += net;
+    });
+    const sd = discountAmount(subtotal, subDisc);
+    if (sd > 0 && subtotal > 0) {
+      let used = 0; const frac = [];
+      out.forEach(function (o, i) {
+        const num = o.net * sd;
+        o.alloc = Math.floor(num / subtotal);
+        used += o.alloc;
+        frac.push({ i: i, r: num % subtotal });
+      });
+      frac.sort(function (a, b) { return b.r - a.r || a.i - b.i; });
+      for (let k = 0; k < sd - used; k++) out[frac[k].i].alloc++;
+      out.forEach(function (o) { o.amount = o.net - o.alloc; });
+    }
+    const byRate = { 8: 0, 10: 0 }; let total = 0;
+    out.forEach(function (o) { byRate[o.rate] += o.amount; total += o.amount; });
+    return { lines: out, subtotal: subtotal, subDisc: sd, total: total, byRate: byRate, tax: { 8: taxInner(byRate[8], 8, mode), 10: taxInner(byRate[10], 10, mode) } };
+  }
+  /** 円の表示（マイナスは -¥1,000） */
+  function fmtYen(n) { if (n === null || n === undefined || n === '') return ''; const v = Number(n); return (v < 0 ? '-' : '') + '¥' + Math.abs(v).toLocaleString('ja-JP'); }
+  /** 税率ごとの対価（税込）の合計を、明細から出す（レシート用。マイナス可） */
+  function byRateOf(lines) { const r = { 8: 0, 10: 0 }; lines.forEach(function (l) { r[l.rate] += l.amount; }); return r; }
+  /** 登録番号の形（T＋13桁）。全角・ハイフンは直す。だめなら null */
+  function normRegNo(v) { const s = nfkc(v == null ? '' : v).replace(/[\s\-]/g, '').toUpperCase(); return /^T\d{13}$/.test(s) ? s : (s === '' ? '' : null); }
+  /** 取引IDの作り方（画面で作る二重送信防止のキー。8〜64文字） */
+  function newTxKey(now, rnd) { return 'k' + now.toString(36) + '-' + rnd.toString(36).slice(2, 10).padEnd(8, '0'); }
+  /** 会計の入力の確認（画面側）: 預り金とお釣り */
+  function changeOf(total, received) { return received - total; }
+  /** 商品CSV（JAN,商品名,単価[,税率区分[,在庫]]）の1行を作る（書き出し用） */
+  function toNum(v) { const n = Number(nfkc(v == null ? '' : v).replace(/[¥円,\s]/g, '')); return isFinite(n) ? n : NaN; }
+
+  return { nfkc, janDigits, janKey, checkDigitOk, validateJan, yen, splitCells, decodeBytes, parseFragment, gasUrlProblem, rgbaToGray, rotate90Gray, cropRegion, createDecoder, toCsv,
+    roundDiv, discountAmount, taxInner, calcCart, fmtYen, byRateOf, normRegNo, newTxKey: newTxKey, changeOf, toNum, RATE_LABEL, PAY_METHODS, ROUND_MODES };
+})();
+/* </logic> */
+
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = (n) => String(n).padStart(2, '0');
+const stamp = () => { const d = new Date(); return pad(d.getMonth() + 1) + '/' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 保存できない環境でも動かす */ } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) { } }
+};
+
+
+const VERSION = '0.2.0';
+const MODES = ['sale', 'tx', 'settle', 'item', 'recv', 'stk'];
+const NOSCAN = ['tx', 'settle', 'arc'];
+const S = {
+  cfg: Object.assign({ gas: '', token: '', sound: true, vibrate: true, speech: false, kbd: false }, store.get('pos.cfg', {})),
+  master: new Map(),            // JANキー → {jan,name,price,rate,stock}
+  masterState: 'none',          // none | loading | ok | error
+  masterErr: '',
+  mode: MODES.indexOf(store.get('pos.mode', 'sale')) >= 0 ? store.get('pos.mode', 'sale') : 'sale',
+  cart: Object.assign({ lines: [], subDisc: null, txKey: '' }, store.get('pos.cart', {})),
+  q: '',                        // 商品ボタンの絞り込み
+  settings: null,               // GASの設定（事業者名・登録番号など）
+  txv: { date: '', rows: null },
+  settle: { date: '', data: null },
+  itemQ: '',
+  rcv: { lines: [], memo: '' },
+  stk: { lines: [], name: '', preview: null },
+  sending: false,
+  cam: { state: 'off', msg: '', last: { text: '', t: 0 } },
+  modal: null
+};
+
+class ApiError extends Error { constructor(code, message, data) { super(message); this.code = code; this.data = data || {}; } }
+
+async function api(action, payload, method) {
+  payload = payload || {}; method = method || 'POST';
+  if (!S.cfg.gas) throw new ApiError('config', '設定（⚙）でGASのURLと合言葉を入れてください');
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 30000);
+  let res, text;
+  try {
+    if (method === 'GET') {
+      const u = new URL(S.cfg.gas);
+      u.searchParams.set('action', action);
+      if (action !== 'ping') u.searchParams.set('token', S.cfg.token);
+      Object.keys(payload).forEach((k) => { if (payload[k] !== undefined && payload[k] !== null) u.searchParams.set(k, payload[k]); });
+      res = await fetch(u.toString(), { signal: ctrl.signal, redirect: 'follow' });
+    } else {
+      // text/plain にして、ブラウザの事前確認（プリフライト）を避ける
+      res = await fetch(S.cfg.gas, {
+        method: 'POST', redirect: 'follow', signal: ctrl.signal,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ action: action, token: S.cfg.token }, payload))
+      });
+    }
+    text = await res.text();
+  } catch (e) {
+    if (e.name === 'AbortError') throw new ApiError('timeout', '通信がタイムアウトしました（30秒）');
+    throw new ApiError('network', '通信できません（' + (e.message || e) + '）。URLの公開設定（全員）と電波を確認してください');
+  } finally { clearTimeout(timer); }
+  let data;
+  try { data = JSON.parse(text); } catch (e) {
+    throw new ApiError('not_json', 'GASがJSONを返しませんでした。URLが /exec か、公開設定が「全員」か確認してください');
+  }
+  if (!data.ok) throw new ApiError(data.error || 'error', data.message || '失敗しました', data);
+  return data;
+}
+
+function errText(e) {
+  if (e instanceof ApiError) {
+    const map = { unauthorized: '合言葉が違います', insufficient_stock: '在庫が足りません', not_in_master: 'マスタにないJANがあります', already_imported: '取り込み済みです', busy: '他の処理中です。もう一度押してください' };
+    return (map[e.code] || '') && (map[e.code] + (e.data && e.data.message ? '：' + e.data.message : '')) || e.message;
+  }
+  return e && e.message ? e.message : String(e);
+}
+
+
+/* ---------- 音・バイブ・読み上げ ---------- */
+let audioCtx = null;
+function unlockMedia() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC && !audioCtx) audioCtx = new AC();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (e) { }
+  try {
+    if (window.speechSynthesis && !S.speechUnlocked) {
+      const u = new SpeechSynthesisUtterance(''); u.volume = 0; speechSynthesis.speak(u); S.speechUnlocked = true;
+    }
+  } catch (e) { }
+}
+function beep(kind) {
+  if (!S.cfg.sound || !audioCtx) return;
+  try {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = kind === 'ng' ? 220 : (kind === 'ok' ? 1320 : 1040);
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (kind === 'ng' ? 0.28 : 0.12));
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.3);
+  } catch (e) { }
+}
+function buzz(ms) { try { if (S.cfg.vibrate && navigator.vibrate) navigator.vibrate(ms || 60); } catch (e) { } }
+function flash() { const b = $('#camBox'); b.classList.add('flash'); setTimeout(() => b.classList.remove('flash'), 260); }
+function speak(text) {
+  if (!S.cfg.speech || !text || !window.speechSynthesis) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; u.rate = 1.05;
+    const v = speechSynthesis.getVoices().find((x) => /^ja/i.test(x.lang));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) { }
+}
+function onDetected() { beep('scan'); buzz(60); flash(); }
+
+/* ---------- トースト・モーダル ---------- */
+function toast(msg, kind) {
+  const box = $('#toast'); const d = document.createElement('div');
+  d.textContent = msg; if (kind) d.className = kind; box.appendChild(d);
+  setTimeout(() => d.remove(), kind === 'bad' ? 5000 : 2800);
+}
+function openModal(html) { $('#sheet').innerHTML = html; $('#modal').classList.add('on'); S.modal = true; }
+function closeModal() { $('#modal').classList.remove('on'); $('#sheet').innerHTML = ''; S.modal = false; setTimeout(kbdFocus, 0); }
+function confirmDialog(o) {
+  return new Promise((resolve) => {
+    S.dlgResolve = resolve;
+    openModal('<h2>' + esc(o.title) + '</h2><div style="margin:8px 0">' + o.body + '</div>' +
+      '<div class="row" style="margin-top:12px"><button class="btn grow" data-act="dlgNo">戻る</button>' +
+      '<button class="btn ' + (o.danger ? 'danger' : 'pri') + ' grow" data-act="dlgYes">' + esc(o.ok || 'OK') + '</button></div>');
+  });
+}
+
+/* ---------- スキャナ ---------- */
+const Scanner = {
+  stream: null, timer: null, decode: null, canvas: document.createElement('canvas'), wake: null,
+  ready() { if (!window.ZXing) return false; if (!this.decode) { this.decode = Logic.createDecoder(window.ZXing, 'product'); this.decodeCode = Logic.createDecoder(window.ZXing, 'code'); } return true; },
+  async start() {
+    if (!this.ready()) throw new Error('ZXing-js を読み込めていません（ネットワークを確認してください）');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error('この表示ではカメラを使えません。https:// のURLで開いているか確認してください');
+    }
+    unlockMedia();
+    const tries = [
+      { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+      { video: { facingMode: 'environment' }, audio: false },
+      { video: true, audio: false }
+    ];
+    let stream = null, lastErr = null;
+    for (const c of tries) {
+      try { stream = await navigator.mediaDevices.getUserMedia(c); break; }
+      catch (e) { lastErr = e; if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) break; }
+    }
+    if (!stream) throw lastErr || new Error('カメラを開始できません');
+    this.stream = stream;
+    const v = $('#video'); v.srcObject = stream; v.setAttribute('playsinline', ''); v.muted = true;
+    await v.play();
+    const tr = stream.getVideoTracks()[0];
+    if (tr) {
+      tr.addEventListener('ended', () => { if (S.cam.state === 'on') setCam('error', 'カメラが止まりました。「カメラ開始」を押し直してください'); });
+      try { await tr.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (e) { }
+    }
+    try { if (navigator.wakeLock) this.wake = await navigator.wakeLock.request('screen'); } catch (e) { }
+  },
+  stop() {
+    clearTimeout(this.timer); this.timer = null;
+    if (this.stream) this.stream.getTracks().forEach((t) => t.stop());
+    this.stream = null;
+    const v = $('#video'); v.srcObject = null;
+    try { if (this.wake) this.wake.release(); } catch (e) { }
+    this.wake = null;
+  },
+  loop() {
+    if (S.cam.state !== 'on') return;
+    const t0 = performance.now();
+    try {
+      const v = $('#video');
+      if (v.readyState >= 2 && v.videoWidth) {
+        const box = $('#camBox');
+        const r = Logic.cropRegion(v.videoWidth, v.videoHeight, box.clientWidth || 4, box.clientHeight || 3);
+        const sc = Math.min(1, 800 / r.w);
+        const w = Math.max(1, Math.round(r.w * sc)), h = Math.max(1, Math.round(r.h * sc));
+        const cv = this.canvas; cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(v, r.x, r.y, r.w, r.h, 0, 0, w, h);
+        const img = ctx.getImageData(0, 0, w, h);
+        const text = (S.codeScan ? this.decodeCode : this.decode)(Logic.rgbaToGray(img.data, w, h), w, h);
+        if (text) handleDetected(text);
+      }
+    } catch (e) { /* 1フレームの失敗は無視 */ }
+    this.timer = setTimeout(() => this.loop(), Math.max(25, 100 - (performance.now() - t0)));
+  }
+};
+
+function setCam(state, msg) {
+  document.body.classList.toggle('camon', state !== 'off');
+  S.cam.state = state; S.cam.msg = msg || '';
+  const m = $('#camMsg'), b = $('#camBtn');
+  const texts = { off: '「カメラ開始」を押してください', starting: 'カメラを起動しています…（許可を求められたら「許可」）', on: '', error: msg };
+  m.textContent = texts[state] || msg || ''; m.classList.toggle('hide', state === 'on');
+  b.textContent = state === 'on' ? 'カメラ停止' : (state === 'error' ? 'カメラをやり直す' : 'カメラ開始');
+  b.disabled = state === 'starting';
+}
+function camErrorMessage(e) {
+  const n = e && e.name;
+  if (n === 'NotAllowedError' || n === 'SecurityError') return 'カメラが許可されていません。iPhoneの「設定 → Safari → カメラ」を「確認」か「許可」にして、このページを開き直してください（ホーム画面アプリの場合は、一度Safariのブラウザ表示で許可すると直ることがあります）';
+  if (n === 'NotFoundError' || n === 'OverconstrainedError') return 'カメラが見つかりません';
+  if (n === 'NotReadableError' || n === 'AbortError') return 'カメラを他のアプリが使っているようです。他のアプリを閉じてやり直してください';
+  return (e && e.message) || 'カメラを開始できません';
+}
+async function camToggle() {
+  if (S.cam.state === 'on') { Scanner.stop(); setCam('off'); return; }
+  setCam('starting');
+  try { await Scanner.start(); setCam('on'); Scanner.loop(); }
+  catch (e) { Scanner.stop(); S.cam.lastError = (e && e.name ? e.name + ': ' : '') + (e && e.message || ''); setCam('error', camErrorMessage(e)); }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && S.cam.state === 'on') { Scanner.stop(); setCam('off'); }
+});
+
+
+function updateCodeBar() { }
+let cancelCodeScan = function () { };
+
+/* ---------- スキャナ（キーボード入力）モード ---------- */
+// Bluetoothスキャナ（HID）は「数字＋Enter」をキーボード入力として送る。JAN入力欄にフォーカスを残しておけば、読み取るたびに onScan が動く
+function kbdFocus(force) {
+  if (!S.cfg.kbd || S.modal) return;
+  const a = document.activeElement;
+  if (!force && a && a !== document.body && a.id !== 'manualJan' && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;   // ほかの入力欄を使っている間は奪わない
+  const el = $('#manualJan');
+  if (el && el.offsetParent !== null && a !== el) { try { el.focus({ preventScroll: true }); } catch (e) { } }
+}
+function applyKbd() {
+  const el = $('#manualJan'); if (!el) return;
+  if (S.cfg.kbd) { el.setAttribute('inputmode', 'none'); el.placeholder = 'スキャナで読み取り（入力待ち）'; el.classList.add('kbdon'); kbdFocus(); }
+  else { el.setAttribute('inputmode', 'numeric'); el.placeholder = 'JANを手入力（読めない時）'; el.classList.remove('kbdon'); }
+  updateCodeBar();
+}
+document.addEventListener('click', () => setTimeout(kbdFocus, 0));
+document.addEventListener('focusout', () => setTimeout(kbdFocus, 60));
+setInterval(kbdFocus, 1500);
+
+
+/* ---------- マスタのキャッシュ ---------- */
+function putItem(it) { S.master.set(Logic.janKey(it.jan), it); }
+function allItems() { return Array.from(S.master.values()); }
+async function loadMaster() {
+  if (!S.cfg.gas) { S.masterState = 'none'; renderStatus(); return; }
+  S.masterState = 'loading'; renderStatus();
+  try {
+    const r = await api('masterList', {}, 'GET');
+    S.master = new Map(); r.items.forEach(putItem);
+    S.masterState = 'ok'; S.masterErr = '';
+  } catch (e) { S.masterState = 'error'; S.masterErr = errText(e); toast(S.masterErr, 'bad'); }
+  renderStatus(); renderPanel();
+}
+async function findItem(jan) {
+  const hit = S.master.get(Logic.janKey(jan));
+  if (hit) return hit;
+  const r = await api('masterGet', { jan: jan }, 'GET');
+  if (r.found) { putItem(r.item); return S.master.get(Logic.janKey(jan)); }
+  return null;
+}
+async function loadSettings() {
+  if (!S.cfg.gas) return;
+  try { S.settings = await api('settingsGet', {}, 'GET'); } catch (e) { S.settings = null; }
+  renderStatus();
+}
+const roundModeNow = () => (S.settings && S.settings.values && S.settings.values['税の端数処理']) || '切り捨て';
+const persistCart = () => store.set('pos.cart', S.cart);
+
+/* ---------- スキャン結果の処理 ---------- */
+function handleDetected(text) {
+  const now = Date.now(), last = S.cam.last;
+  const same = text === last.text && now - last.t < 1000;
+  last.text = text; last.t = now;
+  if (same || S.modal || S.sending || S.scanBusy) return;
+  onScan(text);
+}
+async function onScan(raw) {
+  const v = Logic.validateJan(raw);
+  if (!v.ok) { beep('ng'); toast(v.reason + '：' + raw, 'warn'); return; }
+  onDetected();
+  S.scanBusy = true;
+  try {
+    let item = null;
+    try { item = await findItem(v.jan); } catch (e) { toast(errText(e), 'bad'); return; }
+    const m = S.mode;
+    if (m === 'sale') {
+      if (item) { addToCart(item); speakItem(item); }
+      else { beep('ng'); openNotFound(v.jan); }
+    } else if (m === 'item') {
+      if (item) openItemForm(item); else { beep('ng'); openItemForm({ jan: v.jan, isNew: true }); }
+    } else if (m === 'recv') {
+      if (!item) { beep('ng'); openItemForm({ jan: v.jan, isNew: true }); return; }
+      const l = S.rcv.lines.find((x) => Logic.janKey(x.jan) === Logic.janKey(item.jan));
+      if (l) l.qty += 1; else S.rcv.lines.unshift({ jan: item.jan, name: item.name, qty: 1 });
+      beep('ok'); renderPanel();
+    } else if (m === 'stk') {
+      if (!item) { beep('ng'); openItemForm({ jan: v.jan, isNew: true }); return; }
+      const l = S.stk.lines.find((x) => Logic.janKey(x.jan) === Logic.janKey(item.jan));
+      if (l) l.actual += 1; else S.stk.lines.unshift({ jan: item.jan, name: item.name, book: item.stock, actual: 1 });
+      S.stk.preview = null; beep('ok'); renderPanel();
+    }
+  } finally { S.scanBusy = false; kbdFocus(); }
+}
+function speakItem(item) { speak(item.name + ' ' + (item.price === null ? '' : item.price + '円')); }
+
+/* ---------- 共通の部品 ---------- */
+const hint = (h) => '<div class="hint">' + h + '</div>';
+function seg(items, cur, act) { return '<div class="seg">' + items.map((i) => '<button class="' + (cur === i[0] ? 'on' : '') + '" data-act="' + act + '" data-t="' + i[0] + '">' + esc(i[1]) + '</button>').join('') + '</div>'; }
+function noConfigHint() { return hint('右上の ⚙ で、GASのURLと合言葉を入れてください。入れ終わると、商品マスタが自動で読み込まれます。'); }
+const rateTag = (r) => (r === 8 ? '<span class="tg">軽減8%</span>' : '');
+const tdy = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+function newKey() { return Logic.newTxKey(Date.now(), Math.random()); }
+
+/* ---------- レジ ---------- */
+function cartCalc() {
+  return Logic.calcCart(S.cart.lines.map((l) => ({ price: l.price, qty: l.qty, rate: l.rate, disc: l.disc || null })), S.cart.subDisc || null, roundModeNow());
+}
+function addToCart(item) {
+  if (item.price === null || item.price === undefined) { beep('ng'); toast('単価が未設定の商品です：' + item.name + '（商品タブで単価を入れてください）', 'warn'); return; }
+  const same = S.cart.lines.find((l) => !l.unreg && Logic.janKey(l.jan) === Logic.janKey(item.jan) && !l.disc);
+  if (same) same.qty += 1;
+  else {
+    if (S.cart.lines.length >= 100) { toast('1会計の明細は100行までです', 'warn'); return; }
+    S.cart.lines.push({ jan: item.jan, name: item.name, price: item.price, rate: item.rate, qty: 1, disc: null, unreg: false });
+  }
+  S.cart.txKey = ''; persistCart(); renderPanel();
+}
+function renderSale() {
+  if (!S.cfg.gas) return noConfigHint();
+  const c = cartCalc(), n = S.cart.lines.length;
+  const q = Logic.nfkc(S.q || '').toLowerCase().trim();
+  const items = allItems().filter((i) => !q || (Logic.nfkc(i.name) + ' ' + i.jan).toLowerCase().indexOf(q) >= 0).slice(0, 60);
+  let h = '<div class="card"><div class="row"><b class="grow">カート（' + n + '行）</b>' +
+    '<button class="btn sm" data-act="unreg">未登録商品</button>' +
+    (n ? '<button class="btn sm danger" data-act="cartClear">全部取消</button>' : '') + '</div>';
+  if (!n) h += '<div class="sub" style="margin-top:6px">バーコードを読むか、下の商品ボタンを押してください。</div>';
+  S.cart.lines.forEach((l, i) => {
+    const o = c.lines[i];
+    h += '<div class="line cl"><div class="nm"><b>' + esc(l.name) + '</b>' + rateTag(l.rate) + (l.unreg ? '<span class="tg off">未登録</span>' : '') +
+      '<div class="sub">' + Logic.fmtYen(l.price) + ' × ' + l.qty + (l.disc ? '　<b style="color:var(--warn)">' + (l.disc.type === 'pct' ? l.disc.value + '%引' : Logic.fmtYen(l.disc.value) + '引') + '</b>' : '') + '</div></div>' +
+      '<div class="ctl"><button class="btn sm" data-act="lineDisc" data-i="' + i + '">値引</button>' +
+      '<div class="mini"><button data-act="lineQty" data-i="' + i + '" data-d="-1">−</button><b style="min-width:24px;text-align:center">' + l.qty + '</b><button data-act="lineQty" data-i="' + i + '" data-d="1">＋</button></div>' +
+      '<div class="amt">' + Logic.fmtYen(o.net) + '</div><button class="btn sm" data-act="lineDel" data-i="' + i + '" aria-label="削除">✕</button></div></div>';
+  });
+  if (n) {
+    h += '<div class="bigrow"><span>小計</span><b>' + Logic.fmtYen(c.subtotal) + '</b></div>' +
+      '<div class="bigrow"><span>小計の値引・割引' + (S.cart.subDisc ? '（' + (S.cart.subDisc.type === 'pct' ? S.cart.subDisc.value + '%' : Logic.fmtYen(S.cart.subDisc.value)) + '）' : '') + '</span>' +
+      '<span><b style="color:var(--warn)">' + (c.subDisc ? '-' + Logic.fmtYen(c.subDisc) : '') + '</b> <button class="btn sm" data-act="subDisc">値引</button></span></div>' +
+      '<div class="bigrow"><span>合計（税込）</span><span class="big">' + Logic.fmtYen(c.total) + '</span></div>' +
+      '<div class="sub">10%対象 ' + Logic.fmtYen(c.byRate[10]) + '（内税 ' + Logic.fmtYen(c.tax[10]) + '）／ 軽減8%対象 ' + Logic.fmtYen(c.byRate[8]) + '（内税 ' + Logic.fmtYen(c.tax[8]) + '）</div>' +
+      '<button class="btn pri block" style="margin-top:10px;min-height:56px;font-size:18px" data-act="checkout" ' + (S.sending ? 'disabled' : '') + '>お会計へ</button>';
+  }
+  h += '</div>';
+  h += '<div class="card"><div class="row"><input type="search" data-in="saleQ" id="saleQ" placeholder="商品名・JANで絞り込み" value="' + esc(S.q) + '" autocomplete="off"></div>' +
+    '<div class="pgrid">' + items.map((i) => '<button class="pbtn" data-act="addItem" data-jan="' + esc(i.jan) + '"><b>' + esc(i.name) + '</b><span>' + (i.price === null ? '単価なし' : Logic.fmtYen(i.price)) + (i.rate === 8 ? ' ※' : '') + '　在庫' + i.stock + '</span></button>').join('') + '</div>' +
+    (S.master.size > 60 && !q ? '<div class="sub" style="margin-top:6px">先頭の60品を表示しています。絞り込みを使ってください。</div>' : '') +
+    (!S.master.size ? '<div class="sub" style="margin-top:6px">商品がまだありません。商品タブで登録・取り込みをしてください。</div>' : '') + '</div>';
+  return h;
+}
+function openDiscModal(title, cur, onOk) {
+  S.discCb = onOk;
+  openModal('<h2>' + esc(title) + '</h2>' +
+    seg([['yen', '円で引く'], ['pct', '％で割引']], (cur && cur.type) || 'yen', 'discType') +
+    '<label class="f">値（円 または ％）。0で解除</label><input type="number" class="numin" id="discVal" inputmode="numeric" min="0" value="' + (cur ? cur.value : '') + '">' +
+    '<div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeModal">戻る</button><button class="btn pri grow" data-act="discOk">決定</button></div>');
+  S.discType = (cur && cur.type) || 'yen';
+}
+function discOk() {
+  const v = Math.floor(Number($('#discVal').value));
+  if (!isFinite(v) || v < 0 || (S.discType === 'pct' && v > 100)) { toast('値が正しくありません（％は0〜100の整数）', 'warn'); return; }
+  const cb = S.discCb; S.discCb = null; closeModal();
+  cb(v === 0 ? null : { type: S.discType, value: v });
+}
+function openUnreg(jan) {
+  S.unreg = { rate: 10 };
+  openModal('<h2>未登録商品を売る</h2><div class="sub">マスタに無い商品の売上を、その場の金額で記録します（在庫は動きません）。' + (jan ? '<br>読み取ったJAN: ' + esc(jan) : '') + '</div>' +
+    '<label class="f">金額（税込・1個あたり）</label><input type="number" class="numin" id="unrPrice" inputmode="numeric" min="1">' +
+    '<label class="f">数量</label><input type="number" id="unrQty" inputmode="numeric" min="1" value="1">' +
+    '<label class="f">税率</label>' + seg([['10', '10%'], ['8', '軽減8%']], '10', 'unrRate') +
+    '<div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeModal">戻る</button><button class="btn pri grow" data-act="unrOk">カートに入れる</button></div>');
+}
+function unrOk() {
+  const price = Math.floor(Number($('#unrPrice').value)), qty = Math.floor(Number($('#unrQty').value));
+  if (!(price >= 1) || price > 9999999) { toast('金額は1〜9,999,999円で入れてください', 'warn'); return; }
+  if (!(qty >= 1)) { toast('数量は1以上です', 'warn'); return; }
+  S.cart.lines.push({ jan: '', name: '未登録商品', price: price, rate: S.unreg.rate, qty: qty, disc: null, unreg: true });
+  S.cart.txKey = ''; persistCart(); closeModal(); renderPanel();
+}
+function openNotFound(jan) {
+  openModal('<h2>マスタにない商品です</h2><div class="sub">JAN ' + esc(jan) + '</div>' +
+    '<div class="row wrap" style="margin-top:12px"><button class="btn pri grow" data-act="nfUnreg" data-jan="' + esc(jan) + '">未登録商品として売る</button>' +
+    '<button class="btn grow" data-act="nfReg" data-jan="' + esc(jan) + '">商品として登録</button></div>' +
+    '<button class="btn block" style="margin-top:8px" data-act="closeModal">閉じる</button>');
+}
+
+/* ---------- お会計 ---------- */
+function openCheckout() {
+  if (!S.cart.lines.length) return;
+  if (!S.cart.txKey) { S.cart.txKey = newKey(); persistCart(); }
+  const c = cartCalc();
+  S.co = { method: '現金', received: c.total, guests: 1, total: c.total };
+  const ready = S.settings && S.settings.invoiceReady;
+  openModal('<h2>お会計</h2>' +
+    '<div class="bigrow"><span>合計（税込）</span><span class="big">' + Logic.fmtYen(c.total) + '</span></div>' +
+    '<div class="sub">10%対象 ' + Logic.fmtYen(c.byRate[10]) + '（内税 ' + Logic.fmtYen(c.tax[10]) + '）／ 軽減8%対象 ' + Logic.fmtYen(c.byRate[8]) + '（内税 ' + Logic.fmtYen(c.tax[8]) + '）</div>' +
+    (ready ? '' : '<div class="hint" style="margin-top:6px">登録番号が未設定です。レシートは、適格簡易請求書にはなりません（⚙ の設定で入れられます）。</div>') +
+    '<label class="f">支払方法</label>' + seg(Logic.PAY_METHODS.map((m) => [m, m]), '現金', 'coMethod') +
+    '<div id="coCash"><label class="f">預り金</label><input type="number" class="numin" id="coRecv" data-in="coRecv" inputmode="numeric" min="0" value="' + c.total + '">' +
+    '<div class="quick"><button class="btn" data-act="coJust">ちょうど</button><button class="btn" data-act="coAdd" data-v="1000">1,000</button><button class="btn" data-act="coAdd" data-v="5000">5,000</button><button class="btn" data-act="coAdd" data-v="10000">10,000</button></div>' +
+    '<div class="bigrow"><span>お釣り</span><span class="big" id="coChange">¥0</span></div></div>' +
+    '<label class="f">客数（入力なしは1人）</label><div class="stepper"><button data-act="coGuest" data-d="-1">−</button><input type="number" id="coGuests" data-in="coGuests" inputmode="numeric" min="0" value="1"><button data-act="coGuest" data-d="1">＋</button></div>' +
+    '<div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeModal">戻る</button><button class="btn pri grow" id="coOk" data-act="coConfirm" style="min-height:56px;font-size:18px">会計を確定</button></div>');
+  coRefresh();
+}
+function coRefresh() {
+  const co = S.co; if (!co) return;
+  const cash = co.method === '現金';
+  const box = $('#coCash'); if (box) box.style.display = cash ? '' : 'none';
+  const ch = $('#coChange'), ok = $('#coOk');
+  const diff = Logic.changeOf(co.total, co.received);
+  if (ch) { ch.textContent = Logic.fmtYen(Math.max(0, diff)); ch.style.color = cash && diff < 0 ? 'var(--bad)' : ''; }
+  if (ok) ok.disabled = cash && diff < 0;
+  if (ch && cash && diff < 0) ch.textContent = '不足 ' + Logic.fmtYen(-diff);
+}
+async function coConfirm() {
+  const co = S.co; if (!co || S.sending) return;
+  const lines = S.cart.lines.map((l) => l.unreg
+    ? { unregistered: true, price: l.price, rate: l.rate === 8 ? '8%' : '10%', qty: l.qty, disc: l.disc || undefined }
+    : { jan: l.jan, qty: l.qty, disc: l.disc || undefined });
+  const payload = { txKey: S.cart.txKey, lines: lines, method: co.method, guests: co.guests, subDisc: S.cart.subDisc || undefined };
+  if (co.method === '現金') payload.received = co.received;
+  S.sending = true; $('#coOk').disabled = true;
+  try {
+    const r = await api('saleCreate', payload);
+    S.cart = { lines: [], subDisc: null, txKey: '' }; persistCart();
+    S.co = null; S.sending = false;
+    beep('ok'); buzz(120);
+    if (r.negativeStock && r.negativeStock.length) toast('在庫がマイナスになりました：' + r.negativeStock.map((x) => x.name).join('、'), 'warn');
+    showReceipt(r, true);
+    loadMaster(); renderPanel();
+  } catch (e) {
+    S.sending = false; const ok = $('#coOk'); if (ok) { ok.disabled = false; coRefresh(); }
+    toast(errText(e) + (e.code === 'timeout' || e.code === 'network' ? '（もう一度押しても二重にはなりません）' : ''), 'bad');
+  }
+}
+
+/* ---------- レシート（適格簡易請求書／適格返還請求書） ---------- */
+function receiptHtml(d) {
+  const t = d.tx, iss = d.issuer || {};
+  const lines = d.lines || [];
+  const br = Logic.byRateOf(lines);
+  const hasReg = !!Logic.normRegNo(iss.regNo) && !!iss.name;
+  const ret = t.status === '返品' || t.status === '取消';
+  const title = ret ? (hasReg ? '返品・取消のお知らせ（適格返還請求書）' : '返品・取消のお知らせ') : (hasReg ? '領収書（適格簡易請求書）' : '領収書');
+  let h = '<div class="rc"><h3>' + esc(title) + '</h3>';
+  if (iss.name) h += '<div class="c"><b>' + esc(iss.name) + '</b></div>';
+  if (iss.address) h += '<div class="c sm">' + esc(iss.address) + '</div>';
+  if (iss.tel) h += '<div class="c sm">TEL ' + esc(iss.tel) + '</div>';
+  h += hasReg ? '<div class="c">登録番号 ' + esc(iss.regNo) + '</div>' : '<div class="c sm">（登録番号が未設定です）</div>';
+  h += '<hr><div class="r"><span>' + esc(t.ts) + '</span><span>' + esc(t.id) + '</span></div>';
+  if (ret) h += '<div class="sm">元の取引: ' + esc(t.origId) + (t.origTs ? '（' + esc(t.origTs) + '）' : '') + '</div>';
+  h += '<hr>';
+  lines.forEach((l) => {
+    h += '<div class="ln">' + esc(l.name) + (l.rate === 8 ? ' ※' : '') + '</div><div class="r"><span>　' + Logic.fmtYen(l.price) + ' × ' + l.qty + (l.disc ? '（値引 ' + Logic.fmtYen(l.disc) + '）' : '') + '</span><span>' + Logic.fmtYen(l.amount) + '</span></div>';
+  });
+  h += '<hr><div class="r"><b>' + (ret ? '返還額（税込）' : '合計（税込）') + '</b><b>' + Logic.fmtYen(t.total) + '</b></div>';
+  h += '<div class="r"><span>10%対象（税込）</span><span>' + Logic.fmtYen(br[10]) + '</span></div><div class="r"><span>　内消費税等（10%）</span><span>' + Logic.fmtYen(t.tax10) + '</span></div>';
+  h += '<div class="r"><span>軽減8%対象（税込）※</span><span>' + Logic.fmtYen(br[8]) + '</span></div><div class="r"><span>　内消費税等（8%）</span><span>' + Logic.fmtYen(t.tax8) + '</span></div>';
+  if (!ret) {
+    h += '<hr><div class="r"><span>支払方法</span><span>' + esc(t.method) + '</span></div>';
+    if (t.method === '現金' && t.received !== null && t.received !== undefined) h += '<div class="r"><span>お預り</span><span>' + Logic.fmtYen(t.received) + '</span></div><div class="r"><span>お釣り</span><span>' + Logic.fmtYen(t.change) + '</span></div>';
+  } else h += '<hr><div class="r"><span>返金方法</span><span>' + esc(t.method) + '</span></div>';
+  h += '<hr><div class="sm">※は軽減税率（8%）対象' + (d.reissue ? '　【再発行】' : '') + '</div>';
+  if (iss.message) h += '<div class="c sm" style="margin-top:4px">' + esc(iss.message) + '</div>';
+  return h + '</div>';
+}
+function showReceipt(d, justPaid) {
+  S.rcv_d = d;
+  const t = d.tx;
+  openModal('<h2>' + (justPaid ? '会計完了' : (t.status === '通常' ? '取引の控え' : '返品・取消の控え')) + '</h2>' +
+    (justPaid && t.method === '現金' ? '<div class="banner ok">お釣り ' + Logic.fmtYen(t.change) + '<small>合計 ' + Logic.fmtYen(t.total) + '</small></div>' : '') +
+    (d.duplicate ? '<div class="hint">同じ会計がすでに記録されていたため、前の結果を表示しています。</div>' : '') +
+    receiptHtml(d) +
+    '<div class="row wrap" style="margin-top:10px"><button class="btn grow" data-act="rcPrint">印刷・PDF保存</button><button class="btn pri grow" data-act="closeModal">閉じる</button></div>' +
+    '<div class="sub" style="margin-top:6px">写し（控え）は、取引・売上明細のシートに残っています。取引タブから再発行できます。</div>');
+}
+function printReceipt() {
+  if (!S.rcv_d) return;
+  $('#printArea').innerHTML = receiptHtml(Object.assign({}, S.rcv_d, { reissue: S.rcv_d.tx.reissue }));
+  window.print();
+}
+
+/* ---------- 取引（履歴・再発行・取消・返品） ---------- */
+async function loadTx() {
+  if (!S.cfg.gas) return;
+  if (!S.txv.date) S.txv.date = tdy();
+  try { const r = await api('saleList', { date: S.txv.date.replace(/-/g, '/'), limit: 100 }, 'GET'); S.txv.rows = r.rows; } catch (e) { S.txv.rows = []; toast(errText(e), 'bad'); }
+  renderPanel();
+}
+function renderTx() {
+  if (!S.cfg.gas) return noConfigHint();
+  const v = S.txv;
+  let h = '<div class="card"><div class="row"><input type="date" id="txDate" data-in="txDate" value="' + esc(v.date || tdy()) + '"><button class="btn sm" data-act="txReload">更新</button></div></div>';
+  if (v.rows === null) return h + hint('読み込み中…');
+  if (!v.rows.length) return h + hint('この日の取引はありません。');
+  h += '<div class="card" style="padding:4px 12px">' + v.rows.map((r) => '<div class="line" data-act="txOpen" data-id="' + esc(r.id) + '" style="cursor:pointer"><div class="nm"><b>' + esc(r.ts.slice(11, 16)) + '　' + esc(r.id) + '</b><div class="sub">' + esc(r.method) + (r.guests ? '　' + r.guests + '人' : '') + (r.origId ? '　元: ' + esc(r.origId) : '') + '</div></div><span class="tag ' + (r.status === '通常' ? 'ok' : (r.status === '取消済' ? 'bad' : 'warn')) + '">' + esc(r.status) + '</span><div class="amt" style="' + (r.total < 0 ? 'color:var(--warn)' : '') + '">' + Logic.fmtYen(r.total) + '</div></div>').join('') + '</div>';
+  return h;
+}
+async function txOpen(id) {
+  try {
+    const d = await api('saleGet', { id: id }, 'GET');
+    d.reissue = true; d.tx.reissue = true; S.txd = d;
+    const t = d.tx, orig = t.status === '通常' && !d.archived;
+    openModal('<h2>' + esc(t.id) + ' <span class="tag ' + (t.status === '通常' ? 'ok' : 'warn') + '">' + esc(t.status) + '</span></h2>' + receiptHtml(d) +
+      '<div class="row wrap" style="margin-top:10px"><button class="btn grow" data-act="txPrint">再発行（印刷・PDF）</button>' +
+      (orig ? '<button class="btn grow" data-act="txReturn">返品</button><button class="btn danger grow" data-act="txVoid">取消</button>' : '') + '</div>' +
+      (d.archived ? '<div class="hint" style="margin-top:8px">アーカイブ済みの古い取引です。返品・取消はできません（レシートの再発行はできます）。</div>' : '') +
+      (t.status === '取消済' ? '<div class="hint" style="margin-top:8px">この取引は取消済みです（マイナスの取引で打ち消されています）。</div>' : '') +
+      '<button class="btn block" style="margin-top:8px" data-act="closeModal">閉じる</button>');
+  } catch (e) { toast(errText(e), 'bad'); }
+}
+async function txVoid() {
+  const d = S.txd; if (!d) return;
+  const ok = await confirmDialog({ title: '取引を取消', ok: '取り消す', danger: true, body: esc(d.tx.id) + '（' + Logic.fmtYen(d.tx.total) + '）を取り消します。マイナスの取引を足し、在庫を戻します。<b>元に戻せません</b>。現金の取引は、返金してください。決済サービスを使った取引は、サービス側でも取消が必要な場合があります。' });
+  if (!ok) return;
+  try {
+    const r = await api('saleVoid', { id: d.tx.id });
+    r.reissue = false; beep('ok'); toast('取り消しました', 'ok'); showReceipt(r, false); loadMaster(); loadTx();
+  } catch (e) { toast(errText(e), 'bad'); }
+}
+function txReturnOpen() {
+  const d = S.txd; if (!d) return;
+  S.ret = {};
+  openModal('<h2>返品する商品を選ぶ</h2><div class="sub">' + esc(d.tx.id) + '</div>' +
+    d.lines.map((l) => '<div class="line"><div class="nm"><b>' + esc(l.name) + '</b>' + rateTag(l.rate) + '<div class="sub">' + Logic.fmtYen(l.price) + ' × ' + l.qty + '（返品済 ' + (l.returned || 0) + '／あと ' + (l.remaining === undefined ? l.qty : l.remaining) + '個）</div></div>' +
+      (l.remaining > 0 ? '<div class="mini"><button data-act="retQty" data-l="' + l.line + '" data-d="-1">−</button><b id="ret' + l.line + '" style="min-width:24px;text-align:center">0</b><button data-act="retQty" data-l="' + l.line + '" data-d="1" data-max="' + l.remaining + '">＋</button></div>' : '<span class="tag">全数返品済</span>') + '</div>').join('') +
+    '<div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeModal">戻る</button><button class="btn pri grow" data-act="retOk">返品する</button></div>');
+}
+async function retOk() {
+  const items = Object.keys(S.ret).filter((k) => S.ret[k] > 0).map((k) => ({ line: Number(k), qty: S.ret[k] }));
+  if (!items.length) { toast('返品する数を選んでください', 'warn'); return; }
+  try {
+    const r = await api('saleReturn', { id: S.txd.tx.id, items: items });
+    beep('ok'); toast('返品を記録しました', 'ok'); showReceipt(r, false); loadMaster(); loadTx();
+  } catch (e) { toast(errText(e), 'bad'); }
+}
+
+/* ---------- アーカイブ（古い取引などを別のスプレッドシートへ移す／移したデータを見る）。通信は archiveStatus / archiveSettings / archiveRun / archiveMonths / archiveSearch だけ ---------- */
+const ARC = { st: null, res: null, months: null, kind: 'tx', month: '', q: '', found: null };
+function arcRerender() { if (S.mode === 'arc') renderPanel(); }
+async function loadArc() {
+  if (!S.cfg.gas) return;
+  try {
+    ARC.st = await api('archiveStatus', {}, 'GET');
+    ARC.months = ARC.st.years.length ? await api('archiveMonths', {}, 'GET') : { years: [] };
+  } catch (e) { toast(errText(e), 'bad'); }
+  arcRerender();
+}
+async function arcSet(patch) {
+  try { ARC.st = await api('archiveSettings', patch); ARC.res = null; toast('設定を保存しました', 'ok'); }
+  catch (e) { toast(errText(e), 'bad'); await loadArc(); }
+  arcRerender();
+}
+function arcResHtml(r) {
+  if (!r) return '';
+  const n = r.dryRun ? r.due : r.moved;
+  let h = '<div class="sub" style="margin-top:6px">' + (r.dryRun ? '確認（まだ何も移していません）: ' : '移しました: ') + '取引 <b>' + n.tx + '</b>件／売上明細 <b>' + n.sales + '</b>行／入出荷履歴 <b>' + n.io + '</b>行</div>';
+  if (r.dryRun && r.ids && r.ids.length) h += '<div class="sub">取引: ' + r.ids.map(esc).join('、') + (r.due.tx > r.ids.length ? ' ほか' : '') + '</div>';
+  if (r.capped) h += '<div class="sub">1回に移せる件数の上限に達しました。残りは、もう一度実行すると移ります。</div>';
+  if (r.cutoff) h += '<div class="sub">入出荷履歴は ' + esc(r.cutoff) + ' より前の月を移します（それ以降は残ります）。</div>';
+  if (!r.dryRun && r.files && r.files.length) h += '<div class="sub">移した先: ' + r.files.map((f) => f.url ? '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + esc(f.year) + '年のアーカイブ</a>' : esc(f.year) + '年').join('、') + '</div>';
+  return h;
+}
+async function arcRun(dry) {
+  if (!dry) {
+    const ok = await confirmDialog({ title: '古い取引などを、アーカイブへ移す', ok: '移す', danger: true,
+      body: '設定した日数を過ぎた取引・売上明細と、古い月の入出荷履歴を、アーカイブ用のスプレッドシートへ<b>写し、行数を確かめたうえで</b>、このシートから消します（アーカイブには残ります）。移した取引は、返品・取消ができなくなります（見る・レシートの再発行・精算の集計はできます）。先に「対象を確認」で件数を見ることをおすすめします。' });
+    if (!ok) return;
+  }
+  S.sending = true; renderPanel();
+  try {
+    ARC.res = await api('archiveRun', { dryRun: !!dry });
+    toast(dry ? '確認しました（まだ何も移していません）' : 'アーカイブへ移しました', 'ok');
+    if (!dry) { S.txv.rows = null; await loadArc(); }
+  } catch (e) { toast(errText(e), 'bad'); }
+  finally { S.sending = false; renderPanel(); }
+}
+function arcMonthList() {
+  const set = {};
+  ((ARC.months && ARC.months.years) || []).forEach((y) => (y.months[ARC.kind] || []).forEach((m) => { set[m] = true; }));
+  return Object.keys(set).sort().reverse();
+}
+async function arcSearch() {
+  if (!ARC.month) { toast('月を選んでください', 'warn'); return; }
+  S.sending = true; renderPanel();
+  try { ARC.found = await api('archiveSearch', { kind: ARC.kind, month: ARC.month, q: ARC.q, limit: 200 }, 'GET'); }
+  catch (e) { toast(errText(e), 'bad'); }
+  finally { S.sending = false; renderPanel(); }
+}
+function arcFoundHtml() {
+  const f = ARC.found;
+  if (!f) return '';
+  if (!f.rows.length) return '<div class="sub" style="margin-top:8px">見つかりませんでした（' + esc(f.month) + '）</div>';
+  let h = '<div class="sub" style="margin-top:8px">' + esc(f.month) + '　' + f.count + '件' + (f.truncated ? '（先頭の' + f.rows.length + '件を表示。絞り込んでください）' : '') + '</div>';
+  if (f.kind === 'tx') {
+    h += '<div style="padding:4px 0">' + f.rows.map((r) => '<div class="line" data-act="txOpen" data-id="' + esc(r.id) + '" style="cursor:pointer"><div class="nm"><b>' + esc(r.ts.slice(5, 16)) + '　' + esc(r.id) + '</b><div class="sub">' + esc(r.method) + (r.guests ? '　' + r.guests + '人' : '') + (r.origId ? '　元: ' + esc(r.origId) : '') + '</div></div><span class="tag ' + (r.status === '通常' ? 'ok' : (r.status === '取消済' ? 'bad' : 'warn')) + '">' + esc(r.status) + '</span><div class="amt" style="' + (r.total < 0 ? 'color:var(--warn)' : '') + '">' + Logic.fmtYen(r.total) + '</div></div>').join('') + '</div>';
+  } else {
+    h += '<table class="t"><tr><th>日時</th><th>商品</th><th>区分</th><th class="n">数量</th><th class="n">在庫</th><th>メモ</th></tr>' +
+      f.rows.map((r) => '<tr><td>' + esc(String(r.ts).slice(5, 16)) + '</td><td>' + esc(r.name) + '<div class="sub">' + esc(r.jan) + '</div></td><td>' + esc(r.kubun) + '</td><td class="n">' + r.qty + '</td><td class="n">' + r.after + '</td><td>' + esc(r.memo) + '</td></tr>').join('') + '</table>';
+  }
+  return h;
+}
+function renderArc() {
+  if (!S.cfg.gas) return noConfigHint();
+  const d = ARC.st;
+  let h = hint('古くなった<b>取引・売上明細・入出荷履歴</b>を、<b>年ごとの別のスプレッドシート</b>（「簡易POS_アーカイブ_2026」のように、月ごとのシート）へ移して、普段のシートを軽く保ちます。<br>' +
+    '・<b>取引</b>は、日時から決めた日数が過ぎたものを、売上明細といっしょに移します（返品・取消の取引も、元の取引と同じ扱い）。<br>' +
+    '・<b>入出荷履歴</b>は、直近の数か月だけ残して、古い月を移します。<br>' +
+    '・移した取引は、<b>返品・取消ができなくなります</b>。見る・レシートの再発行・精算の集計（日付を選ぶ）は、今までどおりできます。<br>' +
+    '・移す前に、アーカイブへ写して行数を確かめます。合わなければ、元は消さずに止まります。');
+  if (!d) return h + '<div class="card"><div class="sub">読み込み中…</div></div>';
+  const s = d.settings;
+  h += '<div class="card"><b>設定</b>' +
+    '<label class="f">取引: 日時から</label><select data-in="arcTxDays">' + d.options.days.map((x) => '<option value="' + x + '"' + (s.txDays === x ? ' selected' : '') + '>' + (x > 0 ? x + '日' : '移さない') + '</option>').join('') + '</select>' +
+    '<label class="f">入出荷履歴: 残す期間（当月を含む）</label><select data-in="arcHist">' + d.options.histMonths.map((x) => '<option value="' + x + '"' + (s.histMonths === x ? ' selected' : '') + '>' + (x > 0 ? x + 'か月' : '移さない') + '</option>').join('') + '</select>' +
+    '<label class="f" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" data-in="arcAuto"' + (s.auto ? ' checked' : '') + ' style="width:auto;min-height:0"> 自動で実行する（アプリを使った日の最初の通信で、1日1回）</label>' +
+    '<div class="sub" style="margin-top:6px">最初は、自動実行をOFFのまま「対象を確認」で件数を見て、「今すぐ実行」で移してから、ONにすることをおすすめします。返品を受け付ける期間より短い日数にはしないでください。取引が多い店は、日数が短いほど「直近' + '3,000件」の範囲に収まりやすくなります。データが多い時は、GASの時間トリガー（夜など）に archiveDaily を登録すると、普段の操作が遅くなりません。</div></div>';
+  h += '<div class="card"><b>実行</b><div class="sub">' + (d.last ? '最後の実行: ' + esc(d.last.at) + (d.last.error ? '（失敗: ' + esc(d.last.error) + '）' : '（取引 ' + d.last.tx + '・明細 ' + d.last.sales + '・履歴 ' + d.last.io + '行・' + (d.last.mode === 'auto' ? '自動' : d.last.mode === 'trigger' ? 'トリガー' : '手動') + '）') : 'まだ実行していません') + '</div>' +
+    '<div class="row wrap" style="margin-top:6px"><button class="btn sm" data-act="arcPreview" ' + (S.sending ? 'disabled' : '') + '>対象を確認</button><button class="btn sm danger" data-act="arcRun" ' + (S.sending ? 'disabled' : '') + '>今すぐ実行</button></div>' +
+    arcResHtml(ARC.res) +
+    '<div class="sub" style="margin-top:6px">初回は、アーカイブ用のスプレッドシートを自動で作ります（マイドライブ直下。好きなフォルダへ移して構いません。<b>削除・共有の解除はしないでください</b>）。CSVの書き出しは、いまのシートの分だけです。移した分は、アーカイブのスプレッドシートから取り出せます。</div></div>';
+  const months = arcMonthList();
+  const links = ((ARC.months && ARC.months.years) || []).map((y) => y.url ? '<a href="' + esc(y.url) + '" target="_blank" rel="noopener">' + esc(y.year) + '年</a>' : esc(y.year) + '年').join('　');
+  h += '<div class="card"><b>移したデータを見る</b>' + (links ? '<div class="sub">アーカイブのスプレッドシート: ' + links + '</div>' : '<div class="sub">まだ何も移していません。</div>') +
+    '<label class="f">種類</label><select data-in="arcKind"><option value="tx"' + (ARC.kind === 'tx' ? ' selected' : '') + '>取引</option><option value="io"' + (ARC.kind === 'io' ? ' selected' : '') + '>入出荷履歴</option></select>' +
+    '<label class="f">月</label><select data-in="arcMonth"><option value="">（月を選ぶ）</option>' + months.map((m) => '<option value="' + m + '"' + (ARC.month === m ? ' selected' : '') + '>' + m + '</option>').join('') + '</select>' +
+    '<label class="f">絞り込み（部分一致）</label><input type="search" data-in="arcQ" value="' + esc(ARC.q) + '" placeholder="取引ID・支払方法・状態／JAN・商品名・メモ" autocomplete="off">' +
+    '<button class="btn sm pri" style="margin-top:8px" data-act="arcSearch" ' + (S.sending ? 'disabled' : '') + '>表示</button>' + arcFoundHtml() + '</div>';
+  return h;
+}
+
+/* ---------- 精算 ---------- */
+async function loadSettle() {
+  if (!S.cfg.gas) return;
+  if (!S.settle.date) S.settle.date = tdy();
+  try { S.settle.data = await api('settlement', { date: S.settle.date.replace(/-/g, '/') }, 'GET'); } catch (e) { S.settle.data = null; toast(errText(e), 'bad'); }
+  renderPanel();
+}
+function renderSettle() {
+  if (!S.cfg.gas) return noConfigHint();
+  const s = S.settle, d = s.data;
+  let h = '<div class="card"><div class="row"><input type="date" id="stDate" data-in="stDate" value="' + esc(s.date || tdy()) + '"><button class="btn sm" data-act="stReload">更新</button></div></div>';
+  if (!d) return h + hint('読み込み中…');
+  h += '<div class="card"><div class="bigrow"><span>純売上（税込）</span><span class="big">' + Logic.fmtYen(d.net) + '</span></div>' +
+    '<table class="t"><tr><td>売上（通常）</td><td class="n">' + Logic.fmtYen(d.gross) + '</td></tr><tr><td>返品・取消</td><td class="n">' + Logic.fmtYen(d.refund) + '</td></tr>' +
+    '<tr><td>取引件数</td><td class="n">' + d.count + '件</td></tr><tr><td>客数</td><td class="n">' + d.guests + '人</td></tr>' +
+    '<tr><td>客単価</td><td class="n">' + (d.avgPerGuest === null ? '-' : Logic.fmtYen(d.avgPerGuest)) + '</td></tr>' +
+    '<tr><td>返品 / 取消の件数</td><td class="n">' + d.returnCount + ' / ' + d.voidCount + '</td></tr></table></div>';
+  h += '<div class="card"><b>支払方法別（純額）</b><table class="t">' + Logic.PAY_METHODS.map((m) => '<tr><td>' + m + '</td><td class="n">' + Logic.fmtYen(d.byMethod[m] || 0) + '</td></tr>').join('') + '</table>' +
+    '<div class="sub">現金の売上（レジの現金と照らし合わせる額）: <b>' + Logic.fmtYen(d.cash) + '</b></div></div>';
+  h += '<div class="card"><b>税率別（インボイスの集計）</b><table class="t"><tr><th></th><th class="n">対価（税込）</th><th class="n">内消費税等</th></tr>' +
+    '<tr><td>10%</td><td class="n">' + Logic.fmtYen(d.byRate[10]) + '</td><td class="n">' + Logic.fmtYen(d.tax[10]) + '</td></tr>' +
+    '<tr><td>軽減8%</td><td class="n">' + Logic.fmtYen(d.byRate[8]) + '</td><td class="n">' + Logic.fmtYen(d.tax[8]) + '</td></tr></table>' +
+    '<div class="sub">内消費税等は、取引ごとに「税率ごとに1回」端数処理した額の合計です（申告に使う税額の計算は、税理士などに確認してください）。</div></div>';
+  if (d.truncated) h += hint('取引が多いため、日の先頭の取引が集計に入っていない可能性があります（直近3,000件まで集計します）。');
+  h += '<div class="card"><b>CSVで書き出す</b><div class="row wrap" style="margin-top:6px">' + [['tx', '取引'], ['sales', '売上明細'], ['master', '商品マスタ'], ['io', '入出荷履歴']].map((k) => '<button class="btn sm" data-act="csv" data-kind="' + k[0] + '">' + k[1] + '</button>').join('') + '</div><div class="sub" style="margin-top:6px">いまのシートにある分だけです。アーカイブへ移した古い分は、「アーカイブ」タブのスプレッドシートから取り出せます。</div></div>';
+  return h;
+}
+async function downloadCsv(kind) {
+  try {
+    const r = await api('exportData', { kind: kind }, 'GET');
+    const csv = Logic.toCsv(r.header, r.rows);
+    const d = new Date(), ymd = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })); a.download = '簡易POS_' + r.title + '_' + ymd + '.csv';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    toast(r.title + 'のCSV（' + r.rows.length + '行）を作りました', 'ok');
+  } catch (e) { toast(errText(e), 'bad'); }
+}
+
+/* ---------- 商品 ---------- */
+function renderItems() {
+  if (!S.cfg.gas) return noConfigHint();
+  const q = Logic.nfkc(S.itemQ || '').toLowerCase().trim();
+  const items = allItems().filter((i) => !q || (Logic.nfkc(i.name) + ' ' + i.jan).toLowerCase().indexOf(q) >= 0);
+  let h = '<div class="card"><div class="row"><input type="search" id="itemQ" data-in="itemQ" placeholder="商品名・JANで探す" value="' + esc(S.itemQ) + '" autocomplete="off"><button class="btn sm pri" data-act="itemNew">＋新規</button></div>' +
+    '<div class="sub" style="margin-top:6px">' + items.length + '品。バーコードを読むと、その商品を開きます（無ければ新規登録）。</div></div>';
+  h += '<div class="card" style="padding:4px 12px">' + items.slice(0, 200).map((i) => '<div class="line" data-act="itemEdit" data-jan="' + esc(i.jan) + '" style="cursor:pointer"><div class="nm"><b>' + esc(i.name) + '</b>' + rateTag(i.rate) + '<div class="sub">' + esc(i.jan) + '　在庫 ' + i.stock + '</div></div><div class="amt">' + (i.price === null ? '単価なし' : Logic.fmtYen(i.price)) + '</div></div>').join('') + '</div>';
+  h += '<div class="card"><b>商品の取り込み</b><div class="sub">1行1商品：<b>JAN,商品名,単価（税込）[,税率区分[,在庫]]</b>（税率区分は 10% か 8%。見出し行は自動で除外。既存の商品は名前・単価・税率を更新し、在庫は変えません）</div>' +
+    '<textarea id="impText" data-in="impText" placeholder="4901777300446,伊右衛門 600ml,162,8%,10"></textarea>' +
+    '<div class="row wrap" style="margin-top:6px"><button class="btn sm" data-act="impFile">ファイルを選ぶ</button><button class="btn pri grow" data-act="impRun">取り込む</button></div><div id="impOut" style="margin-top:8px"></div></div>';
+  return h;
+}
+function openItemForm(it) {
+  S.itemForm = { jan: it.jan, isNew: !!it.isNew, rate: it.rate || 10 };
+  openModal('<h2>' + (it.isNew ? '商品を登録' : '商品を編集') + '</h2><div class="sub">JAN ' + esc(it.jan || '') + (it.isNew ? '' : '　現在庫 ' + it.stock + '（在庫は入荷・棚卸で変えます）') + '</div>' +
+    (it.jan ? '' : '<label class="f">JAN（8・12・13桁）</label><input type="text" id="ifJan" inputmode="numeric" autocomplete="off">') +
+    '<label class="f">商品名</label><input type="text" id="ifName" value="' + esc(it.name || '') + '" autocomplete="off">' +
+    '<label class="f">単価（税込・円）</label><input type="number" class="numin" id="ifPrice" inputmode="numeric" min="0" value="' + (it.price === null || it.price === undefined ? '' : it.price) + '">' +
+    '<label class="f">税率区分</label>' + seg([['10', '10%'], ['8', '軽減8%']], String(S.itemForm.rate), 'ifRate') +
+    (it.isNew ? '<label class="f">最初の在庫数（任意）</label><input type="number" id="ifStock" inputmode="numeric" min="0" value="0">' : '') +
+    '<div class="row" style="margin-top:12px"><button class="btn grow" data-act="closeModal">戻る</button><button class="btn pri grow" data-act="ifSave">保存</button></div>');
+}
+async function ifSave() {
+  const f = S.itemForm; const jan = f.jan || ($('#ifJan') && $('#ifJan').value);
+  const v = Logic.validateJan(jan); if (!v.ok) { toast(v.reason, 'warn'); return; }
+  const name = $('#ifName').value.trim(), price = Logic.toNum($('#ifPrice').value);
+  if (!name) { toast('商品名を入れてください', 'warn'); return; }
+  if (!isFinite(price) || price < 0) { toast('単価（税込）を入れてください', 'warn'); return; }
+  const p = { jan: v.jan, name: name, price: price, rate: f.rate === 8 ? '8%' : '10%' };
+  if (f.isNew && $('#ifStock')) p.stock = Number($('#ifStock').value) || 0;
+  try { const r = await api('masterUpsert', p); putItem(r.item); closeModal(); toast(f.isNew ? '登録しました' : '保存しました', 'ok'); renderPanel(); }
+  catch (e) { toast(errText(e), 'bad'); }
+}
+async function runImport(text) {
+  if (!text.trim()) { toast('取り込む内容を貼り付けるか、ファイルを選んでください', 'warn'); return; }
+  $('#impOut').innerHTML = '<div class="sub">取り込み中…</div>';
+  try {
+    const r = await api('masterImport', { text: text });
+    $('#impOut').innerHTML = '<div class="row wrap"><span class="tag ok">追加 ' + r.added + '</span><span class="tag">更新 ' + r.updated + '</span><span class="tag ' + (r.errors.length ? 'bad' : '') + '">エラー ' + r.errors.length + '</span></div>' +
+      (r.errors.length ? '<table class="t" style="margin-top:6px">' + r.errors.slice(0, 20).map((e) => '<tr><td class="n">' + e.line + '行</td><td>' + esc(e.reason) + '</td></tr>').join('') + '</table>' : '');
+    await loadMaster();
+  } catch (e) { $('#impOut').innerHTML = '<div class="err">' + esc(errText(e)) + '</div>'; }
+}
+
+/* ---------- 入荷 ---------- */
+function renderRecv() {
+  if (!S.cfg.gas) return noConfigHint();
+  const L = S.rcv.lines;
+  let h = '<div class="card"><b>入荷（在庫を増やす）</b><div class="sub">バーコードを読むたびに1個ずつ増えます。数えたら「入荷を確定」。</div></div>';
+  if (!L.length) return h + hint('商品のバーコードを読んでください。マスタに無い商品は、その場で登録できます。');
+  h += '<div class="card" style="padding:4px 12px">' + L.map((l, i) => '<div class="line"><div class="nm"><b>' + esc(l.name) + '</b><div class="sub">' + esc(l.jan) + '</div></div><div class="mini"><button data-act="rcvQty" data-i="' + i + '" data-d="-1">−</button><b style="min-width:30px;text-align:center">' + l.qty + '</b><button data-act="rcvQty" data-i="' + i + '" data-d="1">＋</button></div><button class="btn sm" data-act="rcvDel" data-i="' + i + '">✕</button></div>').join('') +
+    '<label class="f">メモ（任意）</label><input type="text" data-in="rcvMemo" value="' + esc(S.rcv.memo) + '" autocomplete="off">' +
+    '<div class="row" style="margin-top:10px"><button class="btn grow" data-act="rcvClear">破棄</button><button class="btn pri grow" data-act="rcvOk" ' + (S.sending ? 'disabled' : '') + '>入荷を確定</button></div></div>';
+  return h;
+}
+async function rcvOk() {
+  const L = S.rcv.lines.filter((l) => l.qty > 0); if (!L.length) return;
+  S.sending = true; renderPanel();
+  try {
+    for (const l of L) await api('receive', { jan: l.jan, qty: l.qty, memo: S.rcv.memo || undefined });
+    toast(L.length + '品の入荷を記録しました', 'ok'); beep('ok'); S.rcv = { lines: [], memo: '' };
+    S.sending = false; await loadMaster();
+  } catch (e) { toast(errText(e), 'bad'); }
+  finally { S.sending = false; renderPanel(); }
+}
+
+/* ---------- 棚卸 ---------- */
+function renderStk() {
+  if (!S.cfg.gas) return noConfigHint();
+  const st = S.stk;
+  let h = '<div class="card"><b>棚卸（数えた商品の差異を直す）</b><div class="sub">数えた商品のバーコードを読むと、数が1ずつ増えます。数えていない商品は変わりません。</div>' +
+    '<label class="f">棚卸の名前</label><input type="text" data-in="stkName" value="' + esc(st.name) + '" placeholder="例: 11月末" autocomplete="off"></div>';
+  if (!st.lines.length) return h + hint('数えた商品のバーコードを読んでください。');
+  h += '<div class="card" style="padding:4px 12px">' + st.lines.map((l, i) => '<div class="line"><div class="nm"><b>' + esc(l.name) + '</b><div class="sub">帳簿 ' + l.book + '　実績 <b>' + l.actual + '</b>　差異 ' + (l.actual - l.book > 0 ? '+' : '') + (l.actual - l.book) + '</div></div><div class="mini"><button data-act="stkQty" data-i="' + i + '" data-d="-1">−</button><input type="number" style="width:64px;text-align:center" data-in="stkAct" data-i="' + i + '" value="' + l.actual + '"><button data-act="stkQty" data-i="' + i + '" data-d="1">＋</button></div><button class="btn sm" data-act="stkDel" data-i="' + i + '">✕</button></div>').join('') +
+    '<div class="row" style="margin-top:10px"><button class="btn grow" data-act="stkClear">破棄</button><button class="btn pri grow" data-act="stkOk" ' + (S.sending ? 'disabled' : '') + '>差異を確定</button></div></div>';
+  return h;
+}
+async function stkOk() {
+  const st = S.stk;
+  if (!st.name.trim()) { toast('棚卸の名前を入れてください', 'warn'); return; }
+  const counts = st.lines.map((l) => ({ jan: l.jan, actual: l.actual }));
+  S.sending = true; renderPanel();
+  try {
+    const p = await api('stocktakePreview', { counts: counts });
+    S.sending = false;
+    const ok = await confirmDialog({ title: '棚卸を確定', ok: '確定する', body: '差異のある商品は <b>' + p.adjust + '品</b> です。在庫を実績にそろえます。' + (p.adjust ? '<table class="t" style="margin-top:6px">' + p.rows.filter((x) => x.diff !== 0).slice(0, 12).map((x) => '<tr><td>' + esc(x.name) + '</td><td class="n">' + x.book + ' → ' + x.actual + '</td></tr>').join('') + '</table>' : '') });
+    if (!ok) { renderPanel(); return; }
+    S.sending = true; renderPanel();
+    await api('stocktakeSave', { name: st.name, counts: counts });
+    toast('棚卸を確定しました', 'ok'); beep('ok'); S.stk = { lines: [], name: '', preview: null };
+    S.sending = false; await loadMaster();
+  } catch (e) { toast(errText(e), 'bad'); }
+  finally { S.sending = false; renderPanel(); }
+}
+
+/* ---------- 描画 ---------- */
+function renderStatus() {
+  const el = $('#status'); if (!el) return;
+  const m = S.masterState, ok = S.settings && S.settings.invoiceReady;
+  el.textContent = !S.cfg.gas ? '未設定' : m === 'loading' ? '読込中…' : m === 'error' ? '接続エラー' : m === 'ok' ? '商品 ' + S.master.size + '品' + (ok ? '・適格' : '') : '接続前';
+  el.classList.toggle('bad', m === 'error' || !S.cfg.gas);
+}
+function renderTabs() {
+  document.querySelectorAll('#tabs button').forEach((b) => b.setAttribute('aria-selected', b.dataset.mode === S.mode ? 'true' : 'false'));
+}
+function renderPanel() {
+  renderTabs();
+  document.body.classList.toggle('noscan', NOSCAN.indexOf(S.mode) >= 0);
+  const f = document.activeElement, keep = f && f.id && f.tagName === 'INPUT' && (f.id === 'saleQ' || f.id === 'itemQ') ? { id: f.id, pos: f.selectionStart } : null;
+  const body = S.mode === 'sale' ? renderSale() : S.mode === 'tx' ? renderTx() : S.mode === 'settle' ? renderSettle() : S.mode === 'item' ? renderItems() : S.mode === 'recv' ? renderRecv() : S.mode === 'arc' ? renderArc() : renderStk();
+  $('#panel').innerHTML = body;
+  if (keep) { const el = $('#' + keep.id); if (el) { el.focus(); try { el.setSelectionRange(keep.pos, keep.pos); } catch (e) { } } }
+  kbdFocus();
+}
+function setMode(m) {
+  S.mode = m; store.set('pos.mode', m); renderPanel();
+  if (m === 'tx') loadTx(); else if (m === 'settle') loadSettle(); else if (m === 'arc') loadArc();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- 設定（接続・インボイス） ---------- */
+function sw(key, label, on) { return '<div class="sw"><span>' + esc(label) + '</span><input type="checkbox" data-in="cfgSw" data-key="' + key + '" ' + (on ? 'checked' : '') + '></div>'; }
+function saveCfg() { store.set('pos.cfg', S.cfg); renderStatus(); }
+let reloadTimer = null;
+function reloadMasterSoon() {
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(() => { const c = S.cfg; if (c.gas && !Logic.gasUrlProblem(c.gas) && c.token && c.token.length >= 16) { loadMaster(); loadSettings(); } }, 1200);
+}
+function updateGasErr() { const el = $('#cfgGasErr'); if (!el) return; el.textContent = S.cfg.gas ? Logic.gasUrlProblem(S.cfg.gas) : ''; }
+function showOut(id, text) { const el = $(id); if (!el) return; el.style.display = 'block'; el.textContent = text; }
+async function runTest(method) {
+  showOut('#testOut', '確認中…'); const t0 = performance.now();
+  try {
+    const r = await api('ping', {}, method);
+    let msg = method + ' OK（' + Math.round(performance.now() - t0) + 'ms） ' + r.app + ' v' + r.version;
+    try { await api('masterList', {}, method); msg += '\n合言葉: OK'; } catch (e2) { msg += '\n合言葉: NG（' + errText(e2) + '）'; }
+    showOut('#testOut', msg);
+  } catch (e) { showOut('#testOut', method + ' NG：' + errText(e)); }
+}
+const SETTING_FIELDS = [['事業者名', '事業者名（レシートに載る名前。屋号や会社名）', 'text'], ['登録番号', '適格請求書発行事業者の登録番号（T＋13桁。例: T1234567890123）', 'text'], ['住所', '住所（任意）', 'text'], ['電話', '電話番号（任意）', 'tel'], ['レシートのメッセージ', 'レシート下部のメッセージ（任意）', 'text']];
+function invoiceBlock() {
+  const st = S.settings;
+  if (!S.cfg.gas) return '';
+  if (!st) return '<div class="sub">設定を読み込み中…（接続を確認してください）</div>';
+  const v = st.values;
+  return '<h2 style="margin-top:16px">インボイス（適格簡易請求書）の設定</h2>' +
+    '<div class="sub">小売業のレシートは、適格簡易請求書にできます。必要な項目は、①発行者の名称と登録番号 ②取引年月日 ③取引内容（軽減税率の対象品目にはその旨）④税率ごとに合計した対価の額（税込） ⑤税率ごとの消費税額等（または適用税率）です。宛先の記載は省略できます（<a href="https://www.nta.go.jp/taxes/shiraberu/zeimokubetsu/shohi/keigenzeiritsu/pdf/qa/58.pdf" target="_blank" rel="noopener">国税庁Q&amp;A 問58</a>）。' +
+    '<br>この画面は①〜⑤を満たすレシートを作りますが、制度の判断（登録の要否、返還の書類、写しの保存、電子帳簿の要件など）は、税理士や国税庁の案内で確認してください。</div>' +
+    SETTING_FIELDS.map((f) => '<label class="f">' + esc(f[1]) + '</label><input type="' + f[2] + '" data-in="setVal" data-k="' + f[0] + '" value="' + esc(v[f[0]] || '') + '" autocomplete="off">').join('') +
+    '<label class="f">消費税の端数処理（1枚のレシートにつき、税率ごとに1回）</label><select data-in="setVal" data-k="税の端数処理">' + st.roundModes.map((m) => '<option' + (v['税の端数処理'] === m ? ' selected' : '') + '>' + m + '</option>').join('') + '</select>' +
+    '<div class="row" style="margin-top:8px"><span class="tag ' + (st.invoiceReady ? 'ok' : 'warn') + '">' + (st.invoiceReady ? 'インボイス対応のレシートを出せます' : '事業者名と登録番号を入れると、適格簡易請求書として出せます') + '</span></div>' +
+    '<button class="btn pri block" style="margin-top:8px" data-act="setSave">この設定を保存</button>';
+}
+async function setSave() {
+  const values = {};
+  document.querySelectorAll('[data-in=setVal]').forEach((el) => { values[el.dataset.k] = el.value; });
+  try { S.settings = await api('settingsSave', { values: values }); toast('設定を保存しました', 'ok'); renderStatus(); openSettings(); }
+  catch (e) { toast(errText(e), 'bad'); }
+}
+function openSettings() {
+  const c = S.cfg;
+  openModal('<h2>設定</h2>' +
+    '<label class="f">GAS WebアプリのURL（…/exec）</label><input type="url" id="cfgGas" data-in="cfgGas" value="' + esc(c.gas) + '" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"><div class="err" id="cfgGasErr"></div>' +
+    '<label class="f">合言葉（GASのスクリプトプロパティ APP_TOKEN と同じもの。16文字以上）</label><input type="password" id="cfgToken" data-in="cfgToken" value="' + esc(c.token) + '" autocomplete="off">' +
+    '<div class="row wrap" style="margin-top:8px"><button class="btn sm" data-act="testGet">接続テスト(GET)</button><button class="btn sm" data-act="testPost">接続テスト(POST)</button><button class="btn sm" data-act="reloadMaster">マスタ再読込</button></div>' +
+    '<div class="pre" id="testOut" style="margin-top:8px;display:none"></div>' +
+    '<div style="margin-top:10px">' + sw('sound', '音', c.sound) + sw('vibrate', 'バイブ（Androidのみ）', c.vibrate) + sw('speech', '読み上げ（商品名と金額）', c.speech) + '</div>' +
+    '<div style="margin-top:6px">' + sw('kbd', 'スキャナ（キーボード入力）モード：Bluetoothスキャナ用', c.kbd) + '</div>' +
+    invoiceBlock() +
+    '<h2 style="margin-top:16px">カメラ診断</h2><div class="row"><button class="btn sm" data-act="diag">診断を実行</button></div><div class="pre" id="diagOut" style="margin-top:8px;display:none"></div>' +
+    '<div class="sub" style="margin-top:14px">簡易POS v' + VERSION + '（試作）</div><button class="btn block" style="margin-top:10px" data-act="closeModal">閉じる</button>');
+  updateGasErr();
+}
+
+async function runDiag() {
+  const L = [];
+  const standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  L.push('表示モード: ' + (standalone ? 'ホーム画面アプリ（standalone）' : 'ブラウザ表示'));
+  L.push('HTTPS等（secure context）: ' + (window.isSecureContext ? 'はい' : 'いいえ ← カメラは使えません'));
+  L.push('URL: ' + location.protocol + '//' + location.host);
+  L.push('mediaDevices: ' + (navigator.mediaDevices ? 'あり' : 'なし'));
+  L.push('getUserMedia: ' + (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'あり' : 'なし'));
+  L.push('ZXing-js: ' + (window.ZXing ? '読み込み済み' : '未読込（CDNに届いていません）'));
+  L.push('BarcodeDetector: ' + ('BarcodeDetector' in window ? 'あり' : 'なし（使いません）'));
+  L.push('バイブ: ' + (navigator.vibrate ? 'あり' : 'なし'));
+  L.push('読み上げ: ' + (window.speechSynthesis ? 'あり（日本語の声 ' + speechSynthesis.getVoices().filter((v) => /^ja/i.test(v.lang)).length + ' 個）' : 'なし'));
+  try {
+    if (navigator.permissions && navigator.permissions.query) { const p = await navigator.permissions.query({ name: 'camera' }); L.push('カメラ許可: ' + p.state); }
+    else L.push('カメラ許可: 取得できません（この環境）');
+  } catch (e) { L.push('カメラ許可: 取得できません'); }
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+      const d = (await navigator.mediaDevices.enumerateDevices()).filter((x) => x.kind === 'videoinput'); L.push('カメラ台数: ' + d.length);
+    }
+  } catch (e) { }
+  L.push('カメラ状態: ' + S.cam.state + (S.cam.lastError ? '\n直近のエラー: ' + S.cam.lastError : ''));
+  L.push('端末: ' + navigator.userAgent);
+  showOut('#diagOut', L.join('\n'));
+}
+
+async function readPhoto(file) {
+  if (!file) return;
+  if (!Scanner.ready()) { toast('ZXing-js を読み込めていません', 'bad'); return; }
+  try {
+    const url = URL.createObjectURL(file);
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('画像を開けません')); i.src = url; });
+    const cv = document.createElement('canvas'), ctx = cv.getContext('2d', { willReadFrequently: true });
+    let text = null;
+    for (const maxW of [1600, 1000, 640]) {
+      const sc = Math.min(1, maxW / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.max(1, Math.round(img.naturalWidth * sc)), h = Math.max(1, Math.round(img.naturalHeight * sc));
+      cv.width = w; cv.height = h; ctx.drawImage(img, 0, 0, w, h);
+      const gray = Logic.rgbaToGray(ctx.getImageData(0, 0, w, h).data, w, h);
+      const dec = S.codeScan ? Scanner.decodeCode : Scanner.decode;
+      text = dec(gray, w, h) || dec(Logic.rotate90Gray(gray, w, h), h, w);
+      if (text) break;
+    }
+    URL.revokeObjectURL(url);
+    if (!text) { beep('ng'); toast('バーコードを読み取れませんでした。バーコードを大きく、水平に撮ってください', 'warn'); return; }
+    onScan(text);
+  } catch (e) { toast(errText(e), 'bad'); }
+}
+
+/* ---------- イベント ---------- */
+const Actions = {
+  tab(d) { setMode(d.mode); },
+  settings() { openSettings(); },
+  closeModal() { S.co = null; closeModal(); },
+  camToggle() { camToggle(); },
+  photo() { $('#photoIn').click(); },
+  manualJan() { const el = $('#manualJan'); const v = el.value; if (!v.trim()) return; unlockMedia(); el.value = ''; onScan(v); },
+  dlgYes() { const r = S.dlgResolve; S.dlgResolve = null; closeModal(); if (r) r(true); },
+  dlgNo() { const r = S.dlgResolve; S.dlgResolve = null; closeModal(); if (r) r(false); },
+  testGet() { runTest('GET'); },
+  testPost() { runTest('POST'); },
+  reloadMaster() { loadMaster(); loadSettings(); },
+  diag() { runDiag(); },
+  setSave() { setSave(); },
+  // レジ
+  addItem(d) { const it = S.master.get(Logic.janKey(d.jan)); if (it) { unlockMedia(); addToCart(it); beep('scan'); } },
+  lineQty(d) { const l = S.cart.lines[Number(d.i)]; if (!l) return; l.qty = Math.max(0, l.qty + Number(d.d)); if (l.qty === 0) S.cart.lines.splice(Number(d.i), 1); S.cart.txKey = ''; persistCart(); renderPanel(); },
+  lineDel(d) { S.cart.lines.splice(Number(d.i), 1); S.cart.txKey = ''; persistCart(); renderPanel(); },
+  lineDisc(d) { const l = S.cart.lines[Number(d.i)]; if (l) openDiscModal('「' + l.name + '」の値引・割引', l.disc, (v) => { l.disc = v; S.cart.txKey = ''; persistCart(); renderPanel(); }); },
+  subDisc() { openDiscModal('小計の値引・割引', S.cart.subDisc, (v) => { S.cart.subDisc = v; S.cart.txKey = ''; persistCart(); renderPanel(); }); },
+  discType(d) { S.discType = d.t; document.querySelectorAll('[data-act=discType]').forEach((b) => b.classList.toggle('on', b.dataset.t === d.t)); },
+  discOk() { discOk(); },
+  async cartClear() { if (await confirmDialog({ title: 'カートを空にする', ok: '空にする', danger: true, body: 'カートの中身をすべて取り消します（会計はまだ記録されていません）。' })) { S.cart = { lines: [], subDisc: null, txKey: '' }; persistCart(); renderPanel(); } },
+  unreg() { openUnreg(''); },
+  unrRate(d) { S.unreg.rate = Number(d.t); document.querySelectorAll('[data-act=unrRate]').forEach((b) => b.classList.toggle('on', b.dataset.t === d.t)); },
+  unrOk() { unrOk(); },
+  nfUnreg(d) { closeModal(); openUnreg(d.jan); },
+  nfReg(d) { closeModal(); openItemForm({ jan: d.jan, isNew: true }); },
+  checkout() { unlockMedia(); openCheckout(); },
+  coMethod(d) { S.co.method = d.t; document.querySelectorAll('[data-act=coMethod]').forEach((b) => b.classList.toggle('on', b.dataset.t === d.t)); coRefresh(); },
+  coJust() { S.co.received = S.co.total; $('#coRecv').value = S.co.total; coRefresh(); },
+  coAdd(d) { S.co.received = (Number($('#coRecv').value) || 0) + Number(d.v); if (Number(d.v) >= S.co.total && !Number($('#coRecv').dataset.touched)) S.co.received = Number(d.v); $('#coRecv').value = S.co.received; coRefresh(); },
+  coGuest(d) { S.co.guests = Math.max(0, Math.min(999, (Number($('#coGuests').value) || 0) + Number(d.d))); $('#coGuests').value = S.co.guests; },
+  coConfirm() { coConfirm(); },
+  rcPrint() { printReceipt(); },
+  // 取引
+  txReload() { loadTx(); },
+  arcPreview() { arcRun(true); },
+  arcRun() { arcRun(false); },
+  arcSearch() { arcSearch(); },
+  txOpen(d) { txOpen(d.id); },
+  txPrint() { S.rcv_d = S.txd; printReceipt(); },
+  txVoid() { txVoid(); },
+  txReturn() { txReturnOpen(); },
+  retQty(d) { const k = d.l; const max = Number(d.max || 0); const cur = S.ret[k] || 0; let n = cur + Number(d.d); if (n < 0) n = 0; const lim = (S.txd.lines.find((x) => String(x.line) === String(k)) || {}).remaining || 0; if (n > lim) n = lim; S.ret[k] = n; $('#ret' + k).textContent = n; },
+  retOk() { retOk(); },
+  // 精算・CSV
+  stReload() { loadSettle(); },
+  csv(d) { downloadCsv(d.kind); },
+  // 商品
+  itemNew() { openItemForm({ jan: '', isNew: true }); },
+  itemEdit(d) { const it = S.master.get(Logic.janKey(d.jan)); if (it) openItemForm(it); },
+  ifRate(d) { S.itemForm.rate = Number(d.t); document.querySelectorAll('[data-act=ifRate]').forEach((b) => b.classList.toggle('on', b.dataset.t === d.t)); },
+  ifSave() { ifSave(); },
+  impFile() { $('#impFile').click(); },
+  impRun() { runImport($('#impText').value); },
+  // 入荷・棚卸
+  rcvQty(d) { const l = S.rcv.lines[Number(d.i)]; if (l) { l.qty = Math.max(0, l.qty + Number(d.d)); renderPanel(); } },
+  rcvDel(d) { S.rcv.lines.splice(Number(d.i), 1); renderPanel(); },
+  rcvClear() { S.rcv = { lines: [], memo: '' }; renderPanel(); },
+  rcvOk() { rcvOk(); },
+  stkQty(d) { const l = S.stk.lines[Number(d.i)]; if (l) { l.actual = Math.max(0, l.actual + Number(d.d)); renderPanel(); } },
+  stkDel(d) { S.stk.lines.splice(Number(d.i), 1); renderPanel(); },
+  stkClear() { S.stk = { lines: [], name: '', preview: null }; renderPanel(); },
+  stkOk() { stkOk(); }
+};
+const Inputs = {
+  saleQ(el) { S.q = el.value; renderPanel(); },
+  itemQ(el) { S.itemQ = el.value; renderPanel(); },
+  coRecv(el) { el.dataset.touched = '1'; S.co.received = Number(el.value) || 0; coRefresh(); },
+  coGuests(el) { S.co.guests = Math.max(0, Math.min(999, Math.floor(Number(el.value)) || 0)); },
+  txDate(el) { S.txv.date = el.value; loadTx(); },
+  arcTxDays(el) { arcSet({ txDays: Number(el.value) }); },
+  arcHist(el) { arcSet({ histMonths: Number(el.value) }); },
+  arcAuto(el) { arcSet({ auto: !!el.checked }); },
+  arcKind(el) { ARC.kind = el.value; ARC.month = ''; ARC.found = null; renderPanel(); },
+  arcMonth(el) { ARC.month = el.value; },
+  arcQ(el) { ARC.q = el.value; },
+  stDate(el) { S.settle.date = el.value; loadSettle(); },
+  rcvMemo(el) { S.rcv.memo = el.value; },
+  stkName(el) { S.stk.name = el.value; },
+  stkAct(el) { const l = S.stk.lines[Number(el.dataset.i)]; if (l) l.actual = Math.max(0, Math.floor(Number(el.value)) || 0); },
+  impText() { },
+  setVal() { },
+  cfgGas(el) { S.cfg.gas = el.value.trim(); saveCfg(); updateGasErr(); reloadMasterSoon(); },
+  cfgToken(el) { S.cfg.token = el.value; saveCfg(); reloadMasterSoon(); },
+  cfgSw(el) { S.cfg[el.dataset.key] = el.checked; saveCfg(); if (el.dataset.key === 'kbd') applyKbd(); }
+};
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.tagName === 'BUTTON' && b.disabled) return;
+  unlockMedia();
+  const f = Actions[b.dataset.act]; if (f) f(b.dataset, e);
+});
+document.addEventListener('input', (e) => {
+  const el = e.target; const k = el.dataset && el.dataset.in; if (!k || !Inputs[k]) return;
+  if (el.type === 'checkbox' || el.type === 'radio' || el.tagName === 'SELECT') return;
+  Inputs[k](el);
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; const k = el.dataset && el.dataset.in; if (!k || !Inputs[k]) return;
+  if (el.type === 'checkbox' || el.type === 'radio' || el.tagName === 'SELECT') Inputs[k](el);
+});
+$('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal' && !S.dlgResolve) { S.co = null; closeModal(); } });
+$('#manualJan').addEventListener('keydown', (e) => { if (e.key === 'Enter') Actions.manualJan(); });
+$('#photoIn').addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; e.target.value = ''; readPhoto(f); });
+document.addEventListener('change', async (e) => {
+  if (e.target.id !== 'impFile') return;
+  const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const text = Logic.decodeBytes(await f.arrayBuffer()); const ta = $('#impText'); if (ta) { ta.value = text; toast('ファイルを読み込みました。「取り込む」で反映します'); } }
+  catch (err) { toast('ファイルを読めません：' + err.message, 'bad'); }
+});
+
+/* ---------- PWA ---------- */
+function setupManifest() {
+  try {
+    const icon = document.querySelector('link[rel=icon]').href;
+    const m = { name: '簡易POS', short_name: '簡易POS', display: 'standalone', orientation: 'portrait',
+      start_url: location.href.split('#')[0], scope: location.href.split('#')[0].replace(/[^/]*$/, ''),
+      background_color: '#0f766e', theme_color: '#0f766e', icons: [{ src: icon, sizes: '180x180', type: 'image/png', purpose: 'any' }] };
+    const l = document.createElement('link'); l.rel = 'manifest';
+    l.href = URL.createObjectURL(new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }));
+    document.head.appendChild(l);
+  } catch (e) { }
+}
+
+/* ---------- 起動 ---------- */
+function applyFragment() {
+  const frag = Logic.parseFragment(location.hash);
+  if (!frag) return false;
+  if (frag.gas) S.cfg.gas = frag.gas;
+  if (frag.token) { S.cfg.token = frag.token; setTimeout(() => toast('リンクに合言葉が含まれていました。このリンクは他の人に送らないでください（初回設定は手入力が安全です）', 'warn'), 600); }
+  saveCfg();
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { }
+  return true;
+}
+window.addEventListener('hashchange', () => { if (applyFragment()) { toast('設定を取り込みました', 'ok'); loadMaster(); loadSettings(); } });
+
+(function init() {
+  applyFragment(); applyKbd(); setupManifest(); setCam('off'); renderStatus(); renderPanel();
+  if (window.speechSynthesis) { try { speechSynthesis.getVoices(); } catch (e) { } }
+  if (S.cfg.gas) { loadMaster(); loadSettings(); if (S.mode === 'tx') loadTx(); if (S.mode === 'settle') loadSettle(); if (S.mode === 'arc') loadArc(); }
+  window.__pos = { S: S, Logic: Logic, Actions: Actions, api: api, onScan: onScan };
+})();
+
+</script>
+</body>
+</html>

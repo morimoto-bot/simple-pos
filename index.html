@@ -426,7 +426,7 @@ const store = {
 };
 
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const MODES = ['sale', 'tx', 'settle', 'item', 'recv', 'stk'];
 const NOSCAN = ['tx', 'settle', 'arc'];
 const S = {
@@ -439,7 +439,7 @@ const S = {
   q: '',                        // 商品ボタンの絞り込み
   settings: null,               // GASの設定（事業者名・登録番号など）
   txv: { date: '', rows: null },
-  settle: { date: '', data: null },
+  settle: { date: '', data: null, from: '', to: '' },
   itemQ: '',
   rcv: { lines: [], memo: '' },
   stk: { lines: [], name: '', preview: null },
@@ -1085,8 +1085,36 @@ function renderSettle() {
     '<tr><td>軽減8%</td><td class="n">' + Logic.fmtYen(d.byRate[8]) + '</td><td class="n">' + Logic.fmtYen(d.tax[8]) + '</td></tr></table>' +
     '<div class="sub">内消費税等は、取引ごとに「税率ごとに1回」端数処理した額の合計です（申告に使う税額の計算は、税理士などに確認してください）。</div></div>';
   if (d.truncated) h += hint('取引が多いため、日の先頭の取引が集計に入っていない可能性があります（直近3,000件まで集計します）。');
+  if (!s.from) rpPreset('this');
+  h += '<div class="card"><b>会計ソフト向け：日別の売上CSV（汎用）</b>' +
+    '<div class="sub" style="margin-top:4px">期間を選ぶと、1日1行で、取引件数・純売上・税率別（税込／内消費税等／税抜）・支払方法別を書き出します。特定の会計ソフトの形式ではありません。表計算で整えたり、会計ソフトの取り込み項目に合わせて使ってください。</div>' +
+    '<div class="row wrap" style="margin-top:8px"><input type="date" data-in="rpFrom" value="' + esc(s.from) + '"><span>〜</span><input type="date" data-in="rpTo" value="' + esc(s.to) + '"></div>' +
+    '<div class="row wrap" style="margin-top:6px"><button class="btn sm" data-act="rpThis">今月</button><button class="btn sm" data-act="rpLast">先月</button><button class="btn sm pri" data-act="rpCsv" ' + (S.sending ? 'disabled' : '') + '>日別の売上CSVを書き出す</button></div>' +
+    '<div class="sub" style="margin-top:6px">金額は税込（円）。返品・取消はマイナスで入り、純額になります。アーカイブへ移した日付も含みます。内消費税等は、取引ごとに税率ごとに1回端数処理した額の合計です。申告用の税額や、仕訳の科目・税区分は決めません（税理士などに確認してください）。</div></div>';
   h += '<div class="card"><b>CSVで書き出す</b><div class="row wrap" style="margin-top:6px">' + [['tx', '取引'], ['sales', '売上明細'], ['master', '商品マスタ'], ['io', '入出荷履歴']].map((k) => '<button class="btn sm" data-act="csv" data-kind="' + k[0] + '">' + k[1] + '</button>').join('') + '</div><div class="sub" style="margin-top:6px">いまのシートにある分だけです。アーカイブへ移した古い分は、「アーカイブ」タブのスプレッドシートから取り出せます。</div></div>';
   return h;
+}
+function rpPreset(which) {
+  const d = new Date(), y = d.getFullYear(), m = d.getMonth();
+  const ymd = (x) => x.getFullYear() + '-' + pad(x.getMonth() + 1) + '-' + pad(x.getDate());
+  if (which === 'last') { S.settle.from = ymd(new Date(y, m - 1, 1)); S.settle.to = ymd(new Date(y, m, 0)); }
+  else { S.settle.from = ymd(new Date(y, m, 1)); S.settle.to = tdy(); }
+}
+async function downloadReport() {
+  const s = S.settle;
+  if (!s.from || !s.to) return toast('期間を入れてください', 'warn');
+  if (s.from > s.to) return toast('開始日が終了日より後です', 'warn');
+  try {
+    const r = await api('dailyReport', { from: s.from, to: s.to }, 'GET');
+    if (!r.rows.length) return toast('この期間に取引はありません', 'warn');
+    const csv = Logic.toCsv(r.header, r.rows.concat([r.total]));
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })); a.download = '簡易POS_日別売上_' + s.from.replace(/-/g, '') + '-' + s.to.replace(/-/g, '') + '.csv';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    toast('日別の売上CSV（' + r.days + '日分）を作りました。最終行は合計です', 'ok');
+    if (r.truncated) toast('取引が多いため、期間の先頭の日が集計に入っていない可能性があります（直近3,000件まで集計します）', 'warn');
+    if (r.archiveError) toast('アーカイブを開けなかった日付があります: ' + r.archiveError, 'warn');
+  } catch (e) { toast(errText(e), 'bad'); }
 }
 async function downloadCsv(kind) {
   try {
@@ -1374,6 +1402,9 @@ const Actions = {
   // 精算・CSV
   stReload() { loadSettle(); },
   csv(d) { downloadCsv(d.kind); },
+  rpThis() { rpPreset('this'); renderPanel(); },
+  rpLast() { rpPreset('last'); renderPanel(); },
+  rpCsv() { downloadReport(); },
   // 商品
   itemNew() { openItemForm({ jan: '', isNew: true }); },
   itemEdit(d) { const it = S.master.get(Logic.janKey(d.jan)); if (it) openItemForm(it); },
@@ -1404,6 +1435,8 @@ const Inputs = {
   arcMonth(el) { ARC.month = el.value; },
   arcQ(el) { ARC.q = el.value; },
   stDate(el) { S.settle.date = el.value; loadSettle(); },
+  rpFrom(el) { S.settle.from = el.value; },
+  rpTo(el) { S.settle.to = el.value; },
   rcvMemo(el) { S.rcv.memo = el.value; },
   stkName(el) { S.stk.name = el.value; },
   stkAct(el) { const l = S.stk.lines[Number(el.dataset.i)]; if (l) l.actual = Math.max(0, Math.floor(Number(el.value)) || 0); },

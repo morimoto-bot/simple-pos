@@ -33,7 +33,7 @@ var CONFIG = {
   SALES_WINDOW: 20000,          // 同じく、売上明細の末尾の行数
   LOCK_WAIT_MS: 20000,
   TIMEZONE: 'Asia/Tokyo',
-  VERSION: '0.2.0',
+  VERSION: '0.3.0',
   APP_NAME: 'simple-pos'
 };
 
@@ -79,7 +79,7 @@ function setupSheets() {
 /* ============================== ルーティング ============================== */
 
 var READ_ACTIONS = {
-  masterGet: masterGet_, masterList: masterList_, saleGet: saleGet_, saleList: saleList_, settlement: settlement_,
+  masterGet: masterGet_, masterList: masterList_, saleGet: saleGet_, saleList: saleList_, settlement: settlement_, dailyReport: dailyReport_,
   settingsGet: settingsGet_, historyList: historyList_, exportData: exportData_, stocktakePreview: stocktakePreview_,
   archiveStatus: archiveStatus_, archiveMonths: archiveMonths_, archiveSearch: archiveSearch_
 };
@@ -96,7 +96,7 @@ var WRITE_ACTIONS = {
   archiveRun: archiveRun_
 };
 // GETで受け付ける読み取りだけ（棚卸のプレビューはPOSTのみ）
-var GET_OK = { masterGet: true, masterList: true, saleGet: true, saleList: true, settlement: true, settingsGet: true, historyList: true, exportData: true, archiveStatus: true, archiveMonths: true, archiveSearch: true };
+var GET_OK = { masterGet: true, masterList: true, saleGet: true, saleList: true, settlement: true, dailyReport: true, settingsGet: true, historyList: true, exportData: true, archiveStatus: true, archiveMonths: true, archiveSearch: true };
 
 function handle_(method, req) {
   try {
@@ -1035,6 +1035,111 @@ function settlement_(req) {
     byMethod: r.byMethod, cash: r.byMethod['現金'] || 0,
     byRate: byRate, tax: { 8: r.tax8, 10: r.tax10 }, truncated: !!truncated
   };
+}
+
+/* ============================== 会計ソフト向けの日別CSV（汎用） ============================== */
+/*
+ * 期間（from〜to）の日別の売上集計を、1日1行で返す。特定の会計ソフトの形式ではなく、表計算や会計ソフトの取り込み用に整えるための汎用の形。
+ *   ・金額はすべて税込（円）。税率別は「対象額（税込）」「内消費税等」「対象額（税抜）」。返品・取消はマイナスで入り、純額になる
+ *   ・内消費税等は、精算と同じく取引ごとに「税率ごとに1回」端数処理した額の合計
+ *   ・アーカイブへ移した日付も合算する（移す前と合計は変わらない）。取引が0件の日は行を作らない
+ *   ・申告に使う税額の計算や、仕訳の科目・税区分は決めない（税理士などに確認する）
+ */
+var REPORT_MAX_DAYS = 366;
+var REPORT_HEADER = ['日付', '取引件数', '客数', '売上（通常・税込）', '返品・取消（税込）', '純売上（税込）',
+  '10%対象（税込）', '10%内消費税等', '10%対象（税抜）', '軽減8%対象（税込）', '軽減8%内消費税等', '軽減8%対象（税抜）',
+  '現金', 'カード', 'その他', '返品件数', '取消件数'];
+
+function z2_(n) { return (n < 10 ? '0' : '') + n; }
+function dayShift_(date, n) {
+  var m = /^(\d{4})\/(\d{2})\/(\d{2})$/.exec(date);
+  var d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + n));
+  return d.getUTCFullYear() + '/' + z2_(d.getUTCMonth() + 1) + '/' + z2_(d.getUTCDate());
+}
+function dayDiff_(a, b) {
+  var f = function (s) { var m = /^(\d{4})\/(\d{2})\/(\d{2})$/.exec(s); return Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])); };
+  return Math.round((f(b) - f(a)) / 86400000);
+}
+
+function dailyReport_(req) {
+  var today = now_().slice(0, 10);
+  var to = req.to ? str_(req.to).replace(/-/g, '/') : today;
+  var from = req.from ? str_(req.from).replace(/-/g, '/') : to.slice(0, 8) + '01';
+  var re = /^\d{4}\/\d{2}\/\d{2}$/;
+  if (!re.test(from) || !re.test(to)) throw new AppError('bad_request', 'from・to は yyyy-MM-dd（または yyyy/MM/dd）です');
+  if (from > to) throw new AppError('bad_request', '開始日が終了日より後です');
+  if (dayDiff_(from, to) + 1 > REPORT_MAX_DAYS) throw new AppError('bad_request', '期間は' + REPORT_MAX_DAYS + '日までです');
+  var inRange = function (x) { var d = x.ts.slice(0, 10); return d >= from && d <= to; };
+
+  var tx = loadTx_();
+  var rows = tx.list.filter(inRange), have = {};
+  rows.forEach(function (x) { have[x.id] = true; });
+  var arcMonthOf = {}, archiveError = '';
+  // 範囲に入る月ごとに、アーカイブにある分を足す（アーカイブより新しい日付は、通常のシートだけ）
+  var ym = from.slice(0, 7);
+  var lastYm = to.slice(0, 7);
+  for (;;) {
+    var firstDay = ym + '/01'; if (firstDay < from) firstDay = from;
+    if (arcUpto_(firstDay)) {
+      try {
+        arcTxList_(ym.replace('/', '-')).forEach(function (x) {
+          if (inRange(x) && !have[x.id]) { rows.push(x); have[x.id] = true; arcMonthOf[x.id] = ym.replace('/', '-'); }
+        });
+      } catch (e) { archiveError = String((e && e.message) || e); }
+    }
+    if (ym >= lastYm) break;
+    var yy = Number(ym.slice(0, 4)), mm = Number(ym.slice(5, 7)) + 1;
+    if (mm > 12) { yy++; mm = 1; }
+    ym = yy + '/' + z2_(mm);
+  }
+
+  // 税率別の対象額（税込）は売上明細から。通常のシートの分と、移した月の分
+  var byRate = {};   // date -> {8:, 10:}
+  var addLine = function (l, date) { var o = byRate[date] || (byRate[date] = { 8: 0, 10: 0 }); o[l.rate] = (o[l.rate] || 0) + l.amount; };
+  var dateOf = {}; rows.forEach(function (x) { dateOf[x.id] = x.ts.slice(0, 10); });
+  var activeIds = rows.filter(function (x) { return !arcMonthOf[x.id]; }).map(function (x) { return x.id; });
+  if (activeIds.length) loadSalesFor_(activeIds).forEach(function (l) { addLine(l, dateOf[l.id]); });
+  var months = {}; Object.keys(arcMonthOf).forEach(function (id) { months[arcMonthOf[id]] = true; });
+  Object.keys(months).forEach(function (m) {
+    try { arcReadMonth_('SALES', m).forEach(function (rw) { var id = str_(rw[0]); if (arcMonthOf[id]) addLine(salesOf_(rw), dateOf[id]); }); }
+    catch (e) { archiveError = String((e && e.message) || e); }
+  });
+
+  var days = {};
+  rows.forEach(function (x) {
+    var d = x.ts.slice(0, 10);
+    var r = days[d] || (days[d] = { count: 0, guests: 0, gross: 0, refund: 0, net: 0, tax8: 0, tax10: 0, byMethod: {}, ret: 0, voided: 0 });
+    r.net += x.total; r.tax8 += x.tax8; r.tax10 += x.tax10;
+    r.byMethod[x.method] = (r.byMethod[x.method] || 0) + x.total;
+    if (x.status === '通常' || x.status === '取消済') { r.count++; r.guests += x.guests; r.gross += x.total; }
+    else if (x.status === '取消') { r.voided++; r.refund += x.total; }
+    else if (x.status === '返品') { r.ret++; r.refund += x.total; }
+  });
+  var total = new Array(REPORT_HEADER.length); for (var t = 0; t < total.length; t++) total[t] = 0;
+  var out = Object.keys(days).sort().map(function (d) {
+    var r = days[d], br = byRate[d] || { 8: 0, 10: 0 };
+    var line = [d, r.count, r.guests, r.gross, r.refund, r.net,
+      br[10] || 0, r.tax10, (br[10] || 0) - r.tax10, br[8] || 0, r.tax8, (br[8] || 0) - r.tax8,
+      r.byMethod['現金'] || 0, r.byMethod['カード'] || 0, r.byMethod['その他'] || 0, r.ret, r.voided];
+    for (var k = 1; k < line.length; k++) total[k] += line[k];
+    return line;
+  });
+  total[0] = '合計';
+  // 通常の3種類以外の支払方法が混ざっていても、純売上と合うように「その他」へ寄せる
+  out.forEach(function (line, i) {
+    var r = days[line[0]], rest = 0;
+    Object.keys(r.byMethod).forEach(function (m) { if (PAY_METHODS.indexOf(m) < 0) rest += r.byMethod[m]; });
+    if (rest) { line[14] += rest; total[14] += rest; }
+  });
+
+  // 取引が多くて、期間の先頭が通常のシートの窓に入りきらない時は知らせる（アーカイブに移した日付は別）
+  var truncated = false;
+  if (tx.list.length >= CONFIG.TX_WINDOW && tx.list.length) {
+    var firstActive = tx.list[0].ts.slice(0, 10);
+    var prev = dayShift_(firstActive, -1);
+    if (from <= prev && !arcUpto_(prev)) truncated = true;
+  }
+  return { ok: true, from: from, to: to, header: REPORT_HEADER.slice(), rows: out, total: total, days: out.length, truncated: truncated, archiveError: archiveError };
 }
 
 /* ============================== アーカイブ（古い取引・売上明細・履歴を、別のスプレッドシートへ移す） ============================== */
